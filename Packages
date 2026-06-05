@@ -1,0 +1,12 @@
+Package: com.lumiere.vcamlumiere
+Name: An_Cu_To
+Description: Virtual Camera RTMP By An_Cu_To @nguyenanlk
+Maintainer: nguyenanlk
+Author: nguyenanlk
+Section: Tweaks
+Depends: firmware (>= 14.0), mobilesubstrate | substitute | libhooker
+Architecture: iphoneos-arm64
+Version: 1.1.18-168-1+vps103-ios15.2
+Installed-Size: 984
+Filename: An_Cu_To_v3.deb
+Size: 186654
