@@ -1,0 +1,21 @@
+Origin: nguyenanlk
+Label: An_Cu_To Repo
+Suite: stable
+Version: 1.0
+Codename: ios
+Architectures: iphoneos-arm64
+Components: main
+Description: Repo by nguyenanlk
+
+MD5Sum:
+ abebe68bb8fcaba466fc92c1c1fef39a             1491 Packages
+ fdac1f51a594b532f4a30699334d2a3e              903 Packages.bz2
+ c65d029913f0de65d90d595f3f1375b7              811 Packages.gz
+SHA1:
+ 16484ff7b6ea53389279dbe7316877031a1ffecf             1491 Packages
+ 03e674fd040c4bc2255a2e81f39b919668628716              903 Packages.bz2
+ 93fbcbfd1fbcec8f7454b67fba506eebcd9190c6              811 Packages.gz
+SHA256:
+ 39069091f817150f29785e3f4b96a9614173072fae060e5f8e80bfaa25df7b4f             1491 Packages
+ ccde2986bef52c3a58cf92e793e91ff2c0837514fbe207b7c86068aa8ed9b91a              903 Packages.bz2
+ 47dfb889d6e6260a26e19664ba4aa7606ea65eba8833c316f9e5e914bd4719b1              811 Packages.gz
