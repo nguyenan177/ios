@@ -3,31 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SongCho Download</title>
+<title>SongCho</title>
 
 <style>
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Segoe UI,Arial,sans-serif;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
 }
 
 body{
     background:linear-gradient(135deg,#0f172a,#1e293b);
-    height:100vh;
+    min-height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
+    padding:20px;
 }
 
 .card{
-    width:430px;
-    max-width:92%;
-    background:white;
-    border-radius:18px;
-    padding:30px;
-    box-shadow:0 15px 40px rgba(0,0,0,.3);
+    width:420px;
+    max-width:100%;
+    background:#fff;
+    border-radius:20px;
+    padding:28px;
+    box-shadow:0 15px 40px rgba(0,0,0,.25);
 }
 
 h1{
@@ -37,50 +38,50 @@ h1{
 }
 
 .item{
-    background:#f3f4f6;
-    border-radius:12px;
-    padding:15px;
+    background:#f5f5f5;
+    border-radius:14px;
+    padding:16px;
     margin-bottom:18px;
 }
 
 .title{
+    font-size:18px;
     font-weight:bold;
     margin-bottom:8px;
-    color:#1f2937;
 }
 
 .link{
     color:#2563eb;
-    word-break:break-all;
-    margin-bottom:12px;
     font-size:14px;
+    word-break:break-all;
+    margin-bottom:15px;
 }
 
 button{
     width:100%;
     border:none;
     background:#2563eb;
-    color:white;
-    padding:12px;
+    color:#fff;
+    padding:13px;
+    font-size:16px;
     border-radius:10px;
     cursor:pointer;
-    font-size:15px;
     transition:.2s;
 }
 
-button:hover{
-    background:#1d4ed8;
+button:active{
+    transform:scale(.98);
 }
 
 #msg{
-    margin-top:15px;
     text-align:center;
+    margin-top:10px;
     color:#16a34a;
     font-weight:bold;
+    min-height:22px;
 }
 </style>
 </head>
-
 <body>
 
 <div class="card">
@@ -90,7 +91,7 @@ button:hover{
 <div class="item">
     <div class="title">📦 TrollStore</div>
     <div class="link">https://songcho.click/1.tipa</div>
-    <button onclick="copy('https://songcho.click/1.tipa')">
+    <button onclick="copyText('https://songcho.click/1.tipa')">
         Sao chép Link TrollStore
     </button>
 </div>
@@ -98,7 +99,7 @@ button:hover{
 <div class="item">
     <div class="title">📱 Sileo Repo</div>
     <div class="link">https://songcho.click</div>
-    <button onclick="copy('https://songcho.click')">
+    <button onclick="copyText('https://songcho.click')">
         Sao chép Link Sileo
     </button>
 </div>
@@ -108,14 +109,66 @@ button:hover{
 </div>
 
 <script>
-function copy(text){
-    navigator.clipboard.writeText(text).then(()=>{
-        document.getElementById("msg").innerHTML="✅ Đã sao chép!";
-        setTimeout(()=>{
-            document.getElementById("msg").innerHTML="";
-        },2000);
-    });
+
+function showMessage(text,color="#16a34a"){
+    const msg=document.getElementById("msg");
+    msg.style.color=color;
+    msg.textContent=text;
+
+    setTimeout(()=>{
+        msg.textContent="";
+    },2000);
 }
+
+function fallbackCopy(text){
+    const textarea=document.createElement("textarea");
+
+    textarea.value=text;
+    textarea.setAttribute("readonly","");
+    textarea.style.position="fixed";
+    textarea.style.left="-9999px";
+
+    document.body.appendChild(textarea);
+
+    textarea.focus();
+    textarea.select();
+    textarea.setSelectionRange(0,99999);
+
+    let ok=false;
+
+    try{
+        ok=document.execCommand("copy");
+    }catch(e){}
+
+    document.body.removeChild(textarea);
+
+    if(ok){
+        showMessage("✅ Đã sao chép!");
+    }else{
+        prompt("Không thể tự sao chép. Hãy nhấn Giữ → Sao chép",text);
+    }
+}
+
+function copyText(text){
+
+    if(navigator.clipboard && window.isSecureContext){
+
+        navigator.clipboard.writeText(text)
+        .then(()=>{
+            showMessage("✅ Đã sao chép!");
+        })
+        .catch(()=>{
+            fallbackCopy(text);
+        });
+
+    }else{
+
+        fallbackCopy(text);
+
+    }
+
+}
+
 </script>
 
 </body>
