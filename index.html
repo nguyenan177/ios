@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SongCho</title>
+<title>🦅 Thần Điêu Store</title>
 
 <style>
 *{
@@ -19,89 +19,217 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
-    padding:20px;
+    padding:25px;
 }
 
 .card{
-    width:420px;
+    width:980px;
     max-width:100%;
     background:#fff;
-    border-radius:20px;
-    padding:28px;
-    box-shadow:0 15px 40px rgba(0,0,0,.25);
+    border-radius:22px;
+    padding:30px;
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
 }
 
 h1{
     text-align:center;
     color:#111827;
-    margin-bottom:25px;
+    margin-bottom:30px;
+}
+
+.layout{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:25px;
 }
 
 .item{
-    background:#f5f5f5;
-    border-radius:14px;
-    padding:16px;
-    margin-bottom:18px;
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:15px;
+    padding:18px;
+    margin-bottom:20px;
 }
 
 .title{
-    font-size:18px;
+    font-size:20px;
     font-weight:bold;
-    margin-bottom:8px;
+    margin-bottom:10px;
+    color:#111827;
 }
 
 .link{
     color:#2563eb;
-    font-size:14px;
     word-break:break-all;
+    line-height:1.6;
+    margin-bottom:15px;
+    font-size:14px;
+}
+
+.note{
+    color:#dc2626;
+    font-size:13px;
     margin-bottom:15px;
 }
 
-button{
+button,
+.download{
     width:100%;
+    display:block;
     border:none;
-    background:#2563eb;
-    color:#fff;
-    padding:13px;
-    font-size:16px;
     border-radius:10px;
+    padding:13px;
+    font-size:15px;
     cursor:pointer;
     transition:.2s;
+    text-decoration:none;
+    text-align:center;
+    margin-top:8px;
 }
 
-button:active{
-    transform:scale(.98);
+.copy{
+    background:#2563eb;
+    color:#fff;
+}
+
+.copy:hover{
+    background:#1d4ed8;
+}
+
+.download{
+    background:#16a34a;
+    color:#fff;
+    font-size:18px;
+}
+
+.download:hover{
+    background:#15803d;
+}
+
+.windows-box{
+    height:100%;
+    min-height:430px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+}
+
+.windows-box p{
+    color:#6b7280;
+    margin:20px 0 30px;
+    line-height:1.6;
 }
 
 #msg{
     text-align:center;
-    margin-top:10px;
+    margin-top:20px;
+    min-height:24px;
     color:#16a34a;
     font-weight:bold;
-    min-height:22px;
+}
+
+@media(max-width:900px){
+
+.layout{
+    grid-template-columns:1fr;
+}
+
+.windows-box{
+    min-height:auto;
+}
+
 }
 </style>
 </head>
+
 <body>
 
 <div class="card">
 
-<h1>🍎 SongCho</h1>
+<h1>🦅 Thần Điêu Store</h1>
+
+<div class="layout">
+
+<!-- LEFT -->
+
+<div>
 
 <div class="item">
-    <div class="title">📦 TrollStore</div>
-    <div class="link">https://songcho.click/1</div>
-    <button onclick="copyText('https://songcho.click/1.tipa')">
-        Sao chép Link TrollStore
-    </button>
+
+<div class="title">
+📦 TrollStore
+</div>
+
+<div class="link">
+<b>Bản 1</b><br>
+https://songcho.click/1
+</div>
+
+<button class="copy" onclick="copyText('https://songcho.click/1')">
+📋 Sao chép Link Bản 1
+</button>
+
+<div class="note">
+Nếu Bản 1 không cài được, hãy thử Bản 2.
+</div>
+
+<div class="link">
+<b>Bản 2</b><br>
+https://songcho.click/2
+</div>
+
+<button class="copy" onclick="copyText('https://songcho.click/2')">
+📋 Sao chép Link Bản 2
+</button>
+
 </div>
 
 <div class="item">
-    <div class="title">📱 Sileo Repo</div>
-    <div class="link">https://songcho.click</div>
-    <button onclick="copyText('https://songcho.click')">
-        Sao chép Link Sileo
-    </button>
+
+<div class="title">
+📱 Sileo Repo
+</div>
+
+<div class="link">
+https://songcho.click
+</div>
+
+<button class="copy" onclick="copyText('https://songcho.click')">
+📋 Sao chép Link Sileo
+</button>
+
+</div>
+
+</div>
+
+<!-- RIGHT -->
+
+<div>
+
+<div class="item windows-box">
+
+<div style="font-size:70px;">💻</div>
+
+<div class="title" style="font-size:28px;">
+Bembemi for Windows
+</div>
+
+<p>
+Phiên bản dành cho Windows.<br>
+Nhấn nút bên dưới để tải ngay.
+</p>
+
+<a class="download"
+href="https://pub-f225fc4c925f4cad963c543c3378b1ae.r2.dev/Bembemi.exe">
+⬇️ Download Bembemi.exe
+</a>
+
+</div>
+
+</div>
+
 </div>
 
 <div id="msg"></div>
@@ -109,24 +237,22 @@ button:active{
 </div>
 
 <script>
-
 function showMessage(text,color="#16a34a"){
     const msg=document.getElementById("msg");
     msg.style.color=color;
-    msg.textContent=text;
+    msg.innerHTML=text;
 
     setTimeout(()=>{
-        msg.textContent="";
+        msg.innerHTML="";
     },2000);
 }
 
 function fallbackCopy(text){
-    const textarea=document.createElement("textarea");
 
+    const textarea=document.createElement("textarea");
     textarea.value=text;
-    textarea.setAttribute("readonly","");
     textarea.style.position="fixed";
-    textarea.style.left="-9999px";
+    textarea.style.opacity="0";
 
     document.body.appendChild(textarea);
 
@@ -134,19 +260,14 @@ function fallbackCopy(text){
     textarea.select();
     textarea.setSelectionRange(0,99999);
 
-    let ok=false;
-
     try{
-        ok=document.execCommand("copy");
-    }catch(e){}
+        document.execCommand("copy");
+        showMessage("✅ Đã sao chép!");
+    }catch(e){
+        prompt("Sao chép thủ công:",text);
+    }
 
     document.body.removeChild(textarea);
-
-    if(ok){
-        showMessage("✅ Đã sao chép!");
-    }else{
-        prompt("Không thể tự sao chép. Hãy nhấn Giữ → Sao chép",text);
-    }
 }
 
 function copyText(text){
@@ -168,7 +289,6 @@ function copyText(text){
     }
 
 }
-
 </script>
 
 </body>
