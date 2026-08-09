@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DUNG Portal</title>
+<style>
+  :root{
+    --bg:#0b0d10; --surface:#111418; --surface-2:#161a1f; --border:#242a31;
+    --text:#e6e9ee; --muted:#8b95a1; --primary:#3b82f6; --primary-fg:#fff;
+    --danger:#ef4444; --success:#22c55e; --warn:#f59e0b;
+    --radius:10px;
+  }
+  html[data-theme="light"]{
+    --bg:#f5f6f8; --surface:#ffffff; --surface-2:#f0f1f4; --border:#e2e5ea;
+    --text:#14181f; --muted:#6b7280; --primary:#3b82f6; --primary-fg:#fff;
+    --danger:#ef4444; --success:#16a34a; --warn:#d97706;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:14px;
+    transition:background .15s, color .15s;
+  }
+  header{
+    position:sticky; top:0; z-index:10; background:var(--bg);
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    height:56px; padding:0 16px;
+  }
+  header .brand{display:flex; align-items:center; gap:8px; font-weight:600; font-size:16px;}
+  header .brand svg{color:var(--muted);}
+  main{max-width:1200px; margin:0 auto; padding:16px; display:flex; flex-direction:column; gap:16px;}
+
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px;}
+  .row{display:flex; flex-wrap:wrap; align-items:center; gap:10px; justify-content:space-between;}
+
+  input, select{
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    border-radius:8px; padding:8px 10px; font-size:13px; outline:none;
+  }
+  input:focus, select:focus{border-color:var(--primary);}
+  input#apiKey{min-width:320px; flex:1;}
+
+  button{
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    border-radius:8px; padding:8px 12px; font-size:13px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px; transition:.15s;
+  }
+  button:hover{background:#1c2127;}
+  button:disabled{opacity:.5; cursor:not-allowed;}
+  button.primary{background:var(--primary); border-color:var(--primary); color:var(--primary-fg);}
+  button.primary:hover{background:#2f6fe0;}
+  button.danger{color:#fca5a5; border-color:#3a1f22;}
+  button.danger:hover{background:#2a1416;}
+  button.ghost{background:transparent;}
+
+  .badge{
+    display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:500;
+    padding:3px 9px; border-radius:999px; border:1px solid var(--border); white-space:nowrap;
+  }
+  .badge.running{color:#86efac; border-color:#1c3a26; background:#0f1f15;}
+  .badge.stopped{color:#fca5a5; border-color:#3a1f22; background:#1f1214;}
+  .badge.unknown{color:var(--muted);}
+  .dot{width:6px; height:6px; border-radius:50%; background:currentColor;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  thead th{
+    text-align:left; font-weight:500; color:var(--muted); padding:10px 8px;
+    border-bottom:1px solid var(--border); white-space:nowrap;
+    position:sticky; top:0; background:var(--surface);
+  }
+  tbody td{padding:10px 8px; border-bottom:1px solid var(--border); vertical-align:middle;}
+  tbody tr:hover{background:#14181d;}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px; color:var(--text);}
+  .muted{color:var(--muted);}
+  .actions{display:flex; gap:6px; justify-content:flex-end;}
+
+  .remote-row{display:flex; align-items:center; gap:8px; padding:3px 0; flex-wrap:wrap;}
+  .proto-badge{
+    font-size:11px; font-weight:700; padding:3px 9px; border-radius:6px; color:#fff;
+    white-space:nowrap; letter-spacing:.3px;
+  }
+  .proto-badge.proto-http{background:#3b82f6;}
+  .proto-badge.proto-sock{background:#f97316;}
+  .proto-plain{color:var(--muted); white-space:nowrap;}
+  .proto-pill{
+    background:var(--surface-2); border:1px solid var(--border); border-radius:999px;
+    padding:3px 12px; cursor:pointer; white-space:nowrap; color:var(--text);
+  }
+  .proto-pill:hover{border-color:var(--primary); color:var(--primary);}
+
+  .empty{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:64px 0; color:var(--muted);}
+
+  .toast-wrap{position:fixed; top:16px; right:16px; display:flex; flex-direction:column; gap:8px; z-index:50;}
+  .toast{
+    background:var(--surface-2); border:1px solid var(--border); border-radius:8px;
+    padding:10px 14px; font-size:13px; min-width:220px; box-shadow:0 4px 16px rgba(0,0,0,.4);
+    animation:slidein .15s ease-out;
+  }
+  .toast.err{border-color:#3a1f22; color:#fca5a5;}
+  .toast.ok{border-color:#1c3a26; color:#86efac;}
+  @keyframes slidein{from{transform:translateX(12px); opacity:0;} to{transform:translateX(0); opacity:1;}}
+
+  .spin{animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .modal-bg{
+    position:fixed; inset:0; background:rgba(0,0,0,.55); display:none;
+    align-items:center; justify-content:center; z-index:40;
+  }
+  .modal-bg.open{display:flex;}
+  .modal{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; width:340px;}
+  .modal h3{margin:0 0 12px; font-size:15px;}
+  .field{display:flex; flex-direction:column; gap:4px; margin-bottom:12px;}
+  .field label{font-size:12px; color:var(--muted);}
+  .field input{width:100%;}
+  .modal .actions-row{display:flex; justify-content:flex-end; gap:8px; margin-top:16px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
+    DUNG Portal
+  </div>
+  <div class="row" style="gap:8px;">
+    <button class="ghost" id="themeToggleBtn" title="Chuyển giao diện sáng/tối">🌙</button>
+    <button class="ghost" id="clearKeyBtn" title="Xóa API Key đã lưu">Đăng xuất</button>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="row">
+      <input id="apiKey" type="password" placeholder="Nhập API Key (x-api-key)..." />
+      <button class="primary" id="connectBtn">Kết nối</button>
+    </div>
+    <div id="keyInfo" class="muted" style="margin-top:10px; font-size:12.5px;"></div>
+  </div>
+
+  <div class="card" id="tableCard" style="display:none;">
+    <div class="row" style="margin-bottom:10px;">
+      <span class="muted" id="deviceLabel"></span>
+      <button id="reloadBtn">↻ Tải lại</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Trạng thái</th>
+          <th>IP public</th>
+          <th>HTTP remote</th>
+          <th style="text-align:right;">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody id="proxyBody">
+        <tr><td colspan="4">
+          <div class="empty">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".5"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            <span>Chưa có dữ liệu proxy</span>
+          </div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<div class="modal-bg" id="authModalBg">
+  <div class="modal">
+    <h3>Đổi xác thực Proxy</h3>
+    <div class="field">
+      <label>Username (dùng "random" để tự sinh)</label>
+      <input id="authUser" value="random" />
+    </div>
+    <div class="field">
+      <label>Password (dùng "random" để tự sinh)</label>
+      <input id="authPass" value="random" />
+    </div>
+    <div class="actions-row">
+      <button class="ghost" id="authCancelBtn">Hủy</button>
+      <button class="primary" id="authSaveBtn">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = "https://tsproxy.com/api/public";
+const state = { apiKey: "", devices: [], currentDeviceId: "", proxies: [], authTarget: null };
+
+const $ = (id) => document.getElementById(id);
+
+function toast(msg, type = "ok") {
+  const el = document.createElement("div");
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  $("toastWrap").appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  $("themeToggleBtn").textContent = theme === "light" ? "☀️" : "🌙";
+  localStorage.setItem("tsproxy_theme", theme);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+  applyTheme(current === "light" ? "dark" : "light");
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...opts,
+    headers: {
+      "x-api-key": state.apiKey,
+      "Content-Type": "application/json",
+      ...(opts.headers || {}),
+    },
+  });
+  let json;
+  try { json = await res.json(); } catch { json = {}; }
+  if (!res.ok || (json.statusCode && json.statusCode >= 400)) {
+    throw new Error(json.message || `Lỗi ${res.status}`);
+  }
+  return json.data;
+}
+
+function formatHttpRemote(p) {
+  const remote = p.httpRemote || "";
+  if (!remote) return "-";
+  const port = remote.includes(":") ? remote.split(":").pop() : remote;
+  let out = `dung.songcho.click:${port}`;
+  const auth = (p.auth || "").trim();
+  if (auth) out += `:${auth}`;
+  return out;
+}
+
+function formatSockRemote(p) {
+  const remote = p.sockRemote || "";
+  if (!remote) return "";
+  const port = remote.includes(":") ? remote.split(":").pop() : remote;
+  let out = `dung.songcho.click:${port}`;
+  const auth = (p.auth || "").trim();
+  if (auth) out += `:${auth}`;
+  return out;
+}
+
+async function copyToClipboard(text, label) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast(`Đã sao chép ${label}`);
+  } catch {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand("copy");
+      toast(`Đã sao chép ${label}`);
+    } catch {
+      toast(`Không thể sao chép ${label}`, "err");
+    }
+    ta.remove();
+  }
+}
+
+function statusBadge(status) {
+  const s = (status || "").toLowerCase();
+  const cls = s === "running" ? "running" : s === "stopped" ? "stopped" : "unknown";
+  const label = s === "running" ? "Đang chạy" : s === "stopped" ? "Đã dừng" : (status || "N/A");
+  return `<span class="badge ${cls}"><span class="dot"></span>${label}</span>`;
+}
+
+function renderProxies() {
+  const body = $("proxyBody");
+  if (!state.proxies.length) {
+    body.innerHTML = `<tr><td colspan="4"><div class="empty">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".5"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+      <span>Không có proxy nào</span></div></td></tr>`;
+    return;
+  }
+  body.innerHTML = state.proxies.map(p => {
+    const httpPill = formatHttpRemote(p);
+    const sockPill = formatSockRemote(p);
+    return `
+    <tr data-id="${p.id}">
+      <td>${statusBadge(p.status)}</td>
+      <td class="mono">${p.ipPublic || "-"}</td>
+      <td class="mono">
+        <div class="remote-row">
+          <span class="proto-badge proto-http">HTTP</span>
+          <span class="proto-pill copy-remote" data-id="${p.id}" data-kind="http" title="Bấm để sao chép">${httpPill}</span>
+        </div>
+        ${sockPill ? `
+        <div class="remote-row">
+          <span class="proto-badge proto-sock">SOCK</span>
+          <span class="proto-pill copy-remote" data-id="${p.id}" data-kind="sock" title="Bấm để sao chép">${sockPill}</span>
+        </div>` : ""}
+      </td>
+      <td>
+        <div class="actions">
+          <button class="rotate-btn" data-id="${p.id}" title="Xoay IP">⟳ Xoay IP</button>
+          <button class="auth-btn" data-id="${p.id}" title="Đổi xác thực">🔑 Auth</button>
+          <button class="danger stop-btn" data-id="${p.id}" title="Tạm dừng">⏸ Dừng</button>
+        </div>
+      </td>
+    </tr>
+  `;
+  }).join("");
+
+  body.querySelectorAll(".rotate-btn").forEach(b => b.onclick = () => rotateProxy(b.dataset.id));
+  body.querySelectorAll(".stop-btn").forEach(b => b.onclick = () => stopProxy(b.dataset.id));
+  body.querySelectorAll(".auth-btn").forEach(b => b.onclick = () => openAuthModal(b.dataset.id));
+  body.querySelectorAll(".copy-remote").forEach(el => el.onclick = () => {
+    const p = state.proxies.find(x => String(x.id) === el.dataset.id);
+    if (!p) return;
+    const text = el.dataset.kind === "sock" ? formatSockRemote(p) : formatHttpRemote(p);
+    const label = el.dataset.kind === "sock" ? "SOCKS remote" : "HTTP remote";
+    copyToClipboard(text, label);
+  });
+}
+
+async function loadProxies() {
+  if (!state.currentDeviceId) return;
+  $("tableCard").style.display = "block";
+  try {
+    state.proxies = await api(`/proxy-list/${state.currentDeviceId}`);
+    renderProxies();
+  } catch (e) {
+    toast(e.message, "err");
+  }
+}
+
+async function connect() {
+  const key = $("apiKey").value.trim();
+  if (!key) { toast("Vui lòng nhập API Key", "err"); return; }
+  state.apiKey = key;
+  $("connectBtn").disabled = true;
+  $("connectBtn").textContent = "Đang kết nối...";
+  try {
+    const info = await api("/key-detail");
+    state.devices = info.devices || [];
+    localStorage.setItem("tsproxy_key", key);
+    $("keyInfo").textContent = `${info.name || "API Key"} · ${state.devices.length} thiết bị · Hết hạn: ${info.expiresAt ? new Date(info.expiresAt).toLocaleString("vi-VN") : "N/A"}`;
+    state.currentDeviceId = state.devices[0]?.id || "";
+    $("deviceLabel").textContent = "dung.songcho.click";
+    await loadProxies();
+    toast("Kết nối thành công", "ok");
+  } catch (e) {
+    toast(e.message, "err");
+  } finally {
+    $("connectBtn").disabled = false;
+    $("connectBtn").textContent = "Kết nối";
+  }
+}
+
+async function rotateProxy(proxyId) {
+  const btn = document.querySelector(`.rotate-btn[data-id="${proxyId}"]`);
+  const prevProxy = state.proxies.find(p => String(p.id) === String(proxyId));
+  const prevIp = prevProxy?.ipPublic || "";
+  if (btn) { btn.disabled = true; btn.innerHTML = `<span class="spin">⟳</span> Đang xoay...`; }
+  try {
+    await api(`/rotate-proxy/${state.currentDeviceId}/${proxyId}`, { method: "POST" });
+    const gotNewIp = await waitForNewIp(proxyId, prevIp);
+    toast(gotNewIp ? "Đã xoay IP thành công" : "Đã gửi lệnh xoay IP (đang chờ IP mới...)", gotNewIp ? "ok" : "err");
+  } catch (e) {
+    toast(e.message, "err");
+  } finally {
+    await loadProxies();
+  }
+}
+
+// Poll proxy list until this proxy reports a new (different, non-empty) public IP,
+// or until timeoutMs elapses. Automatically re-renders the table as soon as it appears.
+async function waitForNewIp(proxyId, prevIp, timeoutMs = 30000, intervalMs = 2000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    await new Promise(r => setTimeout(r, intervalMs));
+    try {
+      const list = await api(`/proxy-list/${state.currentDeviceId}`);
+      const p = list.find(x => String(x.id) === String(proxyId));
+      if (p && p.ipPublic && p.ipPublic !== prevIp) {
+        state.proxies = list;
+        renderProxies();
+        return true;
+      }
+    } catch {
+      // ignore transient errors while polling
+    }
+  }
+  return false;
+}
+
+async function stopProxy(proxyId) {
+  if (!confirm("Tạm dừng proxy này?")) return;
+  try {
+    await api(`/stop-proxy/${state.currentDeviceId}/${proxyId}`, { method: "POST" });
+    toast("Đã tạm dừng");
+    loadProxies();
+  } catch (e) { toast(e.message, "err"); }
+}
+
+function openAuthModal(proxyId) {
+  state.authTarget = proxyId;
+  $("authUser").value = "random";
+  $("authPass").value = "random";
+  $("authModalBg").classList.add("open");
+}
+function closeAuthModal() {
+  $("authModalBg").classList.remove("open");
+  state.authTarget = null;
+}
+async function saveAuth() {
+  const username = $("authUser").value.trim();
+  const password = $("authPass").value.trim();
+  try {
+    await api("/proxy-auth", {
+      method: "POST",
+      body: JSON.stringify({ deviceId: state.currentDeviceId, proxyId: state.authTarget, username, password }),
+    });
+    toast("Đã cập nhật xác thực");
+    closeAuthModal();
+    loadProxies();
+  } catch (e) { toast(e.message, "err"); }
+}
+
+$("connectBtn").onclick = connect;
+$("reloadBtn").onclick = loadProxies;
+$("authCancelBtn").onclick = closeAuthModal;
+$("authSaveBtn").onclick = saveAuth;
+$("themeToggleBtn").onclick = toggleTheme;
+$("clearKeyBtn").onclick = () => {
+  localStorage.removeItem("tsproxy_key");
+  state.apiKey = ""; state.devices = []; state.currentDeviceId = ""; state.proxies = [];
+  $("apiKey").value = ""; $("keyInfo").textContent = "";
+  $("deviceLabel").textContent = ""; $("tableCard").style.display = "none";
+  toast("Đã đăng xuất");
+};
+
+// load saved theme (defaults to dark)
+applyTheme(localStorage.getItem("tsproxy_theme") || "dark");
+
+// auto-load saved key
+const saved = localStorage.getItem("tsproxy_key");
+if (saved) { $("apiKey").value = saved; connect(); }
+</script>
+</body>
+</html>
