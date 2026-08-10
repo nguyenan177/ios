@@ -12,10 +12,12 @@
     --radius:10px;
   }
   html[data-theme="light"]{
-    --bg:#f5f6f8; --surface:#ffffff; --surface-2:#f0f1f4; --border:#e2e5ea;
-    --text:#14181f; --muted:#6b7280; --primary:#3b82f6; --primary-fg:#fff;
-    --danger:#ef4444; --success:#16a34a; --warn:#d97706;
+    --bg:#f7f8fa; --surface:#ffffff; --surface-2:#f4f5f8; --border:#e6e8ee;
+    --text:#1a1f2b; --muted:#6b7280; --primary:#2563eb; --primary-fg:#fff;
+    --danger:#dc2626; --success:#16a34a; --warn:#d97706;
+    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 2px 8px rgba(16,24,40,.04);
   }
+  html[data-theme="dark"]{ --shadow: none; }
   *{box-sizing:border-box;}
   body{
     margin:0; background:var(--bg); color:var(--text);
@@ -33,7 +35,7 @@
   header .brand svg{color:var(--muted);}
   main{max-width:1200px; margin:0 auto; padding:16px; display:flex; flex-direction:column; gap:16px;}
 
-  .card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px;}
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; box-shadow:var(--shadow, none);}
   .row{display:flex; flex-wrap:wrap; align-items:center; gap:10px; justify-content:space-between;}
 
   input, select{
@@ -54,15 +56,22 @@
   button.primary:hover{background:#2f6fe0;}
   button.danger{color:#fca5a5; border-color:#3a1f22;}
   button.danger:hover{background:#2a1416;}
+  html[data-theme="light"] button.danger{color:#dc2626; border-color:#fbd0cf; background:#fff5f5;}
+  html[data-theme="light"] button.danger:hover{background:#fee2e2;}
+  html[data-theme="light"] button{box-shadow:var(--shadow, none);}
+  html[data-theme="light"] button:hover{background:#eef1f6;}
+  html[data-theme="light"] button.primary:hover{background:#1d4ed8;}
   button.ghost{background:transparent;}
 
   .badge{
     display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:500;
     padding:3px 9px; border-radius:999px; border:1px solid var(--border); white-space:nowrap;
   }
-  .badge.running{color:#86efac; border-color:#1c3a26; background:#0f1f15;}
-  .badge.stopped{color:#fca5a5; border-color:#3a1f22; background:#1f1214;}
+  .badge.running{color:#16a34a; border-color:#bbf0cc; background:#eafcf1;}
+  .badge.stopped{color:#dc2626; border-color:#fbd0cf; background:#fef1f1;}
   .badge.unknown{color:var(--muted);}
+  html[data-theme="dark"] .badge.running{color:#86efac; border-color:#1c3a26; background:#0f1f15;}
+  html[data-theme="dark"] .badge.stopped{color:#fca5a5; border-color:#3a1f22; background:#1f1214;}
   .dot{width:6px; height:6px; border-radius:50%; background:currentColor;}
 
   table{width:100%; border-collapse:collapse; font-size:13px;}
@@ -73,6 +82,7 @@
   }
   tbody td{padding:10px 8px; border-bottom:1px solid var(--border); vertical-align:middle;}
   tbody tr:hover{background:#14181d;}
+  html[data-theme="light"] tbody tr:hover{background:#f6f8fc;}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px; color:var(--text);}
   .muted{color:var(--muted);}
   .actions{display:flex; gap:6px; justify-content:flex-end;}
@@ -101,6 +111,9 @@
   }
   .toast.err{border-color:#3a1f22; color:#fca5a5;}
   .toast.ok{border-color:#1c3a26; color:#86efac;}
+  html[data-theme="light"] .toast{box-shadow:0 4px 16px rgba(16,24,40,.08);}
+  html[data-theme="light"] .toast.err{border-color:#fbd0cf; color:#dc2626; background:#fef1f1;}
+  html[data-theme="light"] .toast.ok{border-color:#bbf0cc; color:#16a34a; background:#eafcf1;}
   @keyframes slidein{from{transform:translateX(12px); opacity:0;} to{transform:translateX(0); opacity:1;}}
 
   .spin{animation:spin 1s linear infinite;}
@@ -189,7 +202,12 @@
 
 <script>
 const API_BASE = "https://tsproxy.com/api/public";
+const AUTO_RELOAD_SECONDS = 3;
 const state = { apiKey: "", devices: [], currentDeviceId: "", proxies: [], authTarget: null };
+let autoReloadTimer = null;
+let countdownTimer = null;
+let secondsLeft = AUTO_RELOAD_SECONDS;
+let isReloading = false;
 
 const $ = (id) => document.getElementById(id);
 
@@ -326,14 +344,47 @@ function renderProxies() {
   });
 }
 
+function updateReloadBtnLabel() {
+  const btn = $("reloadBtn");
+  if (!btn || isReloading) return;
+  btn.textContent = `↻ Tải lại (${secondsLeft}s)`;
+}
+
+function stopAutoReload() {
+  if (autoReloadTimer) { clearInterval(autoReloadTimer); autoReloadTimer = null; }
+  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+}
+
+function startAutoReload() {
+  stopAutoReload();
+  secondsLeft = AUTO_RELOAD_SECONDS;
+  updateReloadBtnLabel();
+  countdownTimer = setInterval(() => {
+    if (isReloading) return;
+    secondsLeft -= 1;
+    if (secondsLeft <= 0) secondsLeft = AUTO_RELOAD_SECONDS;
+    updateReloadBtnLabel();
+  }, 1000);
+  autoReloadTimer = setInterval(() => {
+    loadProxies();
+  }, AUTO_RELOAD_SECONDS * 1000);
+}
+
 async function loadProxies() {
   if (!state.currentDeviceId) return;
   $("tableCard").style.display = "block";
+  isReloading = true;
+  const btn = $("reloadBtn");
+  if (btn) btn.innerHTML = `<span class="spin">↻</span> Đang tải...`;
   try {
     state.proxies = await api(`/proxy-list/${state.currentDeviceId}`);
     renderProxies();
   } catch (e) {
     toast(e.message, "err");
+  } finally {
+    isReloading = false;
+    secondsLeft = AUTO_RELOAD_SECONDS;
+    updateReloadBtnLabel();
   }
 }
 
@@ -351,6 +402,7 @@ async function connect() {
     state.currentDeviceId = state.devices[0]?.id || "";
     $("deviceLabel").textContent = "dung.songcho.click";
     await loadProxies();
+    startAutoReload();
     toast("Kết nối thành công", "ok");
   } catch (e) {
     toast(e.message, "err");
@@ -431,7 +483,7 @@ async function saveAuth() {
 }
 
 $("connectBtn").onclick = connect;
-$("reloadBtn").onclick = loadProxies;
+$("reloadBtn").onclick = () => { loadProxies(); startAutoReload(); };
 $("authCancelBtn").onclick = closeAuthModal;
 $("authSaveBtn").onclick = saveAuth;
 $("themeToggleBtn").onclick = toggleTheme;
@@ -440,8 +492,18 @@ $("clearKeyBtn").onclick = () => {
   state.apiKey = ""; state.devices = []; state.currentDeviceId = ""; state.proxies = [];
   $("apiKey").value = ""; $("keyInfo").textContent = "";
   $("deviceLabel").textContent = ""; $("tableCard").style.display = "none";
+  stopAutoReload();
   toast("Đã đăng xuất");
 };
+
+// stop auto-reload polling when tab is hidden, resume when visible
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    stopAutoReload();
+  } else if (state.currentDeviceId) {
+    startAutoReload();
+  }
+});
 
 // load saved theme (defaults to dark)
 applyTheme(localStorage.getItem("tsproxy_theme") || "dark");
