@@ -152,6 +152,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
     const db = getFirestore(app);
     const accountsCol = collection(db, "accounts");
     const groupsCol   = collection(db, "groups");
+  const accountDataCol = collection(db, "accountData");
     const settingsRef = doc(db, "settings", "apiKeys");
 
     let allAccounts = [];
@@ -159,6 +160,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
     let activeGroupId = null;     // null = tất cả
     let modalAccountId = null;
     let modalSelectedGroupIds = new Set();
+  let currentDataAccountId = null;
 
     const DEFAULT_API_KEY         = "ed7192f2d8bd0a6ee3b60a1915cc0084";
     const DEFAULT_CAPTCHA_API_KEY = "7354dfda0562f14700d36f923868d5e7";
@@ -496,7 +498,77 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
       closeGroupModal();
     };
 
-    // Close modal on overlay click
+    
+  // ===========================
+  // MODAL: DATA tài khoản
+  // ===========================
+  window.openDataModal = async function(accountId) {
+    currentDataAccountId = accountId;
+    const acc = allAccounts.find(a => a.id === accountId);
+    document.getElementById("dataModalInfo").textContent = acc ? `📌 ${acc.data.name} — ${acc.data.account}` : "";
+
+    // Reset form
+    document.getElementById("dataUsername").value = "";
+    document.getElementById("dataPassword").value = "";
+    document.getElementById("dataFullname").value = "";
+    document.getElementById("dataPhone").value = "";
+    document.getElementById("dataGmail").value = "";
+    document.getElementById("dataStatusMsg").textContent = "";
+    document.getElementById("dataStatusMsg").className = "api-status-msg";
+
+    // Load existing data
+    try {
+      const snap = await getDoc(doc(db, "accountData", accountId));
+      if (snap.exists()) {
+        const d = snap.data();
+        document.getElementById("dataUsername").value = d.username || "";
+        document.getElementById("dataPassword").value = d.password || "";
+        document.getElementById("dataFullname").value = d.fullname || "";
+        document.getElementById("dataPhone").value = d.phone || "";
+        document.getElementById("dataGmail").value = d.gmail || "";
+      }
+    } catch(e) { console.warn("Không tải được data:", e); }
+
+    document.getElementById("dataModal").classList.add("open");
+  };
+
+  window.closeDataModal = function() {
+    document.getElementById("dataModal").classList.remove("open");
+    currentDataAccountId = null;
+  };
+
+  window.saveAccountData = async function() {
+    if (!currentDataAccountId) return;
+    const payload = {
+      username: document.getElementById("dataUsername").value.trim(),
+      password: document.getElementById("dataPassword").value.trim(),
+      fullname: document.getElementById("dataFullname").value.trim(),
+      phone: document.getElementById("dataPhone").value.trim(),
+      gmail: document.getElementById("dataGmail").value.trim(),
+      updatedAt: serverTimestamp()
+    };
+    const btn = document.querySelector('#dataModal .modal-btn-confirm');
+    const originalText = btn.textContent;
+    btn.disabled = true; btn.textContent = "⏳ Đang lưu...";
+    try {
+      await setDoc(doc(db, "accountData", currentDataAccountId), payload);
+      const el = document.getElementById("dataStatusMsg");
+      el.textContent = "✅ Đã lưu thành công!";
+      el.className = "api-status-msg success";
+      setTimeout(() => { el.textContent = ""; el.className = "api-status-msg"; }, 2500);
+    } catch(e) {
+      const el = document.getElementById("dataStatusMsg");
+      el.textContent = "❌ Lỗi: " + e.message;
+      el.className = "api-status-msg error";
+    }
+    btn.disabled = false; btn.textContent = originalText;
+  };
+
+  document.getElementById("dataModal").addEventListener("click", function(e) {
+    if (e.target === this) closeDataModal();
+  });
+
+// Close modal on overlay click
     document.getElementById("groupModal").addEventListener("click", function(e) {
       if (e.target === this) closeGroupModal();
     });
@@ -553,6 +625,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
             <button class="btn btn-stk"  onclick="copyText('${data.account}')">💳 Copy STK</button>
             <button class="btn btn-tag"  onclick="toggleTagInput('${id}')">➕ Thêm Tag</button>
             <button class="btn btn-del" onclick="deleteAccount('${id}')">❌ Xoá</button>
+          </div>
+          <div style="margin-top:8px;">
+            <button class="btn btn-data" onclick="openDataModal('${id}')" style="width:100%;">📝 DATA</button>
           </div>
         `;
         list.appendChild(div);

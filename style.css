@@ -192,3 +192,59 @@
     .modal-btn-confirm { flex: 1; background: #7c3aed; color: white; border: none; border-radius: 8px; padding: 10px; font-weight: 700; font-size: 14px; cursor: pointer; margin: 0; }
     .modal-btn-cancel  { background: #f5f5f5; color: #555; border: 1.5px solid #ccc; border-radius: 8px; padding: 10px 16px; font-weight: 600; font-size: 14px; cursor: pointer; margin: 0; width: auto !important; }
     .modal-empty { font-size: 14px; color: #aaa; text-align: center; padding: 18px; font-style: italic; }
+
+/* ===== DATA MODAL ===== */
+.data-form label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-top: 10px;
+  display: block;
+}
+.data-form input {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 4px 0 10px;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.data-form input:focus {
+  border-color: #2196F3;
+  outline: none;
+}
+.btn-data {
+  background: #7c3aed;
+  color: white;
+}
+.data-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-top: 6px;
+}
+
+/* ===== DATA BUTTON & MODAL ===== */
+.btn-data { background: linear-gradient(90deg, #7c3aed, #a78bfa); color: white; }
+.btn-data:hover { filter: brightness(1.1); }
+
+.data-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #ede8fd;
+  color: #7c3aed;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-left: 6px;
+}
