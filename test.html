@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>📋 Quản lý tài khoản (Firebase)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+<div id="loginView">
+  <div class="auth-box">
+    <h2>🔐 Đăng nhập</h2>
+
+    <div class="quick-login-box" id="quickLoginBox" style="display:none;">
+      <div class="quick-login-heading">⚡ Đăng nhập nhanh</div>
+      <div id="quickAccountsList"></div>
+      <div class="divider-or">hoặc đăng nhập bằng tài khoản khác</div>
+    </div>
+
+    <label>👤 Tên đăng nhập</label>
+    <input type="text" id="loginUsername" placeholder="Nhập tên đăng nhập..." autocomplete="username" />
+    <label>🔒 Mật khẩu</label>
+    <input type="password" id="loginPassword" placeholder="Nhập mật khẩu..." autocomplete="current-password" />
+    <div class="remember-row">
+      <input type="checkbox" id="rememberAccount" checked />
+      <label for="rememberAccount" style="margin:0;">💾 Ghi nhớ để đăng nhập nhanh lần sau</label>
+    </div>
+    <button class="submit" id="btnLogin" onclick="doLogin()">Đăng nhập</button>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+</div>
+
+
+<div id="managerView" style="display:none;">
+<div class="topbar">
+  <div class="who"><span class="dot"></span> <span id="whoUser">—</span></div>
+  <button onclick="doLogout()">🚪 Đăng xuất</button>
+</div>
+
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+  <h2 style="display: flex; align-items: center; gap: 8px; margin: 0;">📋 Danh sách tài khoản</h2>
+  <div style="font-size: 15px; font-weight: 500;">Tổng Bank: <span id="totalCount">0</span></div>
+</div>
+
+<!-- ⚙️ API SETTINGS PANEL -->
+<div class="api-settings-panel" id="apiSettingsPanel">
+  <div class="api-settings-header" onclick="toggleApiPanel()">
+    <div class="api-settings-header-left">
+      <span class="icon">⚙️</span>
+      Cài đặt API & Hệ thống
+      <span class="api-saved-indicator" id="apiSavedDot" title="Đã lưu cài đặt"></span>
+    </div>
+    <button class="api-settings-toggle" id="apiToggleBtn" onclick="event.stopPropagation(); toggleApiPanel()">▼ Mở</button>
+  </div>
+  <div class="api-settings-body" id="apiSettingsBody">
+    <div class="api-section-heading">🔑 API Keys</div>
+    <div class="api-field-label">🔑 API Key chính <span class="badge badge-blue">DEFAULT_API_KEY</span></div>
+    <div class="api-input-wrap">
+      <input type="password" id="inputApiKey" placeholder="Nhập API Key..." autocomplete="off" />
+      <button class="api-eye-btn" onclick="toggleVisible('inputApiKey', 'eye1')" id="eye1" title="Hiện/ẩn">👁️</button>
+    </div>
+    <div class="api-field-label" style="margin-top:10px;">🤖 Captcha API Key <span class="badge badge-blue">DEFAULT_CAPTCHA_API_KEY</span></div>
+    <div class="api-input-wrap">
+      <input type="password" id="inputCaptchaKey" placeholder="Nhập Captcha API Key..." autocomplete="off" />
+      <button class="api-eye-btn" onclick="toggleVisible('inputCaptchaKey', 'eye2')" id="eye2" title="Hiện/ẩn">👁️</button>
+    </div>
+    <div class="api-section-heading" style="margin-top:18px;">🔒 Mật khẩu hệ thống</div>
+    <div class="api-field-label">🔑 Mật khẩu đăng ký <span class="badge badge-orange">PASSWORD</span></div>
+    <div class="api-input-wrap">
+      <input type="password" id="inputPassword" placeholder="Nhập mật khẩu đăng ký..." autocomplete="new-password" />
+      <button class="api-eye-btn" onclick="toggleVisible('inputPassword', 'eye3')" id="eye3" title="Hiện/ẩn">👁️</button>
+    </div>
+    <div class="api-field-label" style="margin-top:10px;">🔒 Mật khẩu rút tiền <span class="badge badge-orange">WITHDRAW_PASSWORD</span></div>
+    <div class="api-input-wrap">
+      <input type="password" id="inputWithdrawPassword" placeholder="Nhập mật khẩu rút tiền..." autocomplete="new-password" />
+      <button class="api-eye-btn" onclick="toggleVisible('inputWithdrawPassword', 'eye4')" id="eye4" title="Hiện/ẩn">👁️</button>
+    </div>
+    <div class="api-section-heading" style="margin-top:18px;">📱 Telegram</div>
+    <div class="api-field-label">💬 Telegram Chat ID <span class="badge badge-teal">TG_CHATID</span></div>
+    <input type="text" id="inputTgChatId" class="api-input-plain" placeholder="Nhập Telegram Chat ID..." autocomplete="off" />
+    <div class="api-actions">
+      <button class="api-btn-save" onclick="saveApiKeys()">💾 Lưu tất cả cài đặt</button>
+      <button class="api-btn-reset" onclick="resetApiKeys()">🔄 Reset</button>
+    </div>
+    <div class="api-status-msg" id="apiStatusMsg"></div>
+    <div style="margin-top:10px;">
+      <button onclick="showActiveKeys()" style="width:100%;background:#f0f7ff;border:1.5px solid #90caf9;border-radius:8px;padding:9px;font-size:14px;font-weight:600;color:#1565C0;cursor:pointer;margin:0;">
+        🔍 Xem cài đặt đang hoạt động
+      </button>
+    </div>
+    <div class="active-key-box" id="activeKeyBox" style="display:none;">
+      <div class="active-key-row"><span class="active-key-label">🔑 API Key:</span><span class="active-key-val" id="activeApiKeyVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activeApiKeyVal')">📋 Copy</button></div>
+      <div class="active-key-row"><span class="active-key-label">🤖 Captcha:</span><span class="active-key-val" id="activeCaptchaKeyVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activeCaptchaKeyVal')">📋 Copy</button></div>
+      <div class="active-key-row"><span class="active-key-label">🔑 MK Đăng ký:</span><span class="active-key-val" id="activePasswordVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activePasswordVal')">📋 Copy</button></div>
+      <div class="active-key-row"><span class="active-key-label">🔒 MK Rút tiền:</span><span class="active-key-val" id="activeWithdrawVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activeWithdrawVal')">📋 Copy</button></div>
+      <div class="active-key-row"><span class="active-key-label">💬 TG Chat ID:</span><span class="active-key-val" id="activeTgChatIdVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activeTgChatIdVal')">📋 Copy</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- 👥 GROUPS PANEL -->
+<div class="group-panel" id="groupPanel">
+  <div class="group-panel-header" onclick="toggleGroupPanel()">
+    <div class="group-panel-header-left">
+      <span style="font-size:20px;">👥</span>
+      Quản lý nhóm
+      <span id="groupCountBadge" style="font-size:12px;background:#7c3aed;color:white;border-radius:20px;padding:1px 9px;font-weight:700;">0</span>
+    </div>
+    <button class="group-panel-toggle" id="groupToggleBtn" onclick="event.stopPropagation(); toggleGroupPanel()">▼ Mở</button>
+  </div>
+  <div class="group-panel-body" id="groupPanelBody">
+    <div class="group-create-row">
+      <input type="text" id="newGroupName" placeholder="Tên nhóm mới..." style="margin:0;" />
+      <button onclick="createGroup()">➕ Tạo nhóm</button>
+    </div>
+    <div class="group-list" id="groupList">
+      <div class="group-empty">Chưa có nhóm nào. Tạo nhóm mới ở trên!</div>
+    </div>
+  </div>
+</div>
+
+<!-- 🔍 FILTER BAR (nhóm) -->
+<div class="group-filter-bar" id="groupFilterBar">
+  <button class="group-filter-toggle" id="groupFilterToggle" onclick="toggleGroupFilterDropdown()">
+    <span style="font-size:16px;">🗂️</span>
+    <span class="gf-current" id="groupFilterCurrent">Tất cả</span>
+    <span class="gf-arrow">▼</span>
+  </button>
+  <div class="group-filter-dropdown" id="groupFilterDropdown">
+    <button class="group-filter-tab active" onclick="filterByGroup(null, this)">🗂️ Tất cả</button>
+  </div>
+</div>
+
+<!-- 🔍 SEARCH -->
+<div class="search-wrapper">
+  <span class="search-icon">🔍</span>
+  <input type="text" id="searchInput" placeholder="Tìm theo tên hoặc số tài khoản..." oninput="handleSearch()" />
+  <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
+</div>
+<div class="search-result-count" id="searchResultCount"></div>
+
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+  <div class="section-title" style="margin: 0;">➕ Thêm tài khoản</div>
+</div>
+<input type="text" id="name" placeholder="Tên" />
+<input type="text" id="account" placeholder="Số tài khoản" />
+
+<div class="bank-select-wrapper" id="wrapper-tagSelect">
+  <div class="bank-select-display placeholder" id="display-tagSelect" onclick="toggleBankDropdown('tagSelect')">
+    <span class="display-text">-- Chọn ngân hàng --</span><span class="arrow">▼</span>
+  </div>
+  <input type="hidden" id="tagSelect" value="" />
+  <div class="bank-dropdown" id="dropdown-tagSelect">
+    <div class="bank-dropdown-search">🔍 <input type="text" placeholder="Tìm ngân hàng..." oninput="filterBankOptions('tagSelect', this.value)" /></div>
+    <div class="bank-dropdown-list" id="list-tagSelect"></div>
+  </div>
+</div>
+<button onclick="addAccount()" id="btnAdd">Thêm</button>
+
+<div class="section-title">🧾 Nhập hàng loạt</div>
+<textarea id="bulkInput" rows="5" placeholder="Nhập mỗi dòng: Tên - STK"></textarea>
+<div class="bank-select-wrapper" id="wrapper-bulkTag">
+  <div class="bank-select-display placeholder" id="display-bulkTag" onclick="toggleBankDropdown('bulkTag')">
+    <span class="display-text">-- Chọn ngân hàng --</span><span class="arrow">▼</span>
+  </div>
+  <input type="hidden" id="bulkTag" value="" />
+  <div class="bank-dropdown" id="dropdown-bulkTag">
+    <div class="bank-dropdown-search">🔍 <input type="text" placeholder="Tìm ngân hàng..." oninput="filterBankOptions('bulkTag', this.value)" /></div>
+    <div class="bank-dropdown-list" id="list-bulkTag"></div>
+  </div>
+</div>
+<button onclick="addBulk()" id="btnBulk">➕ Thêm hàng loạt</button>
+<button onclick="copyAll()">📋 Sao chép danh sách</button>
+<button onclick="deleteSelectedAccounts()">🗑️ Xoá đã chọn</button>
+<button onclick="openGroupModalForSelected()" style="width:100%;background:#7c3aed;color:white;border:none;">👥 Thêm đã chọn vào nhóm</button>
+
+<div id="accountList">Đang tải danh sách...</div>
+
+<!-- MODAL: chọn nhóm để add tài khoản -->
+<div class="modal-overlay" id="groupModal">
+  <div class="modal-box">
+    <div class="modal-title">👥 Thêm vào nhóm</div>
+    <div id="modalAccountInfo" style="font-size:13px;color:#555;margin-bottom:10px;"></div>
+    <div class="modal-group-list" id="modalGroupList"></div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeGroupModal()">Huỷ</button>
+      <button class="modal-btn-confirm" onclick="confirmAddToGroup()">✅ Lưu</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="utils.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
