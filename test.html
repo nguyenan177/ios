@@ -194,30 +194,57 @@
 
 <!-- MODAL: DATA tài khoản -->
 <div class="modal-overlay" id="dataModal">
+  <div class="modal-box">
+    <div class="modal-title">📝 Thông tin tài khoản</div>
+    <div id="dataModalInfo" style="font-size:13px;color:#555;margin-bottom:10px;"></div>
+    <div class="data-form">
+      <label>👤 Tên tài khoản</label>
+      <input type="text" id="dataUsername" placeholder="Nhập tên tài khoản..." />
+      <label>🔒 Mật khẩu</label>
+      <input type="text" id="dataPassword" placeholder="Nhập mật khẩu..." />
+      <label>🧑 Họ và Tên</label>
+      <input type="text" id="dataFullname" placeholder="Nhập họ và tên..." />
+      <label>📱 Số điện thoại</label>
+      <input type="text" id="dataPhone" placeholder="Nhập số điện thoại..." />
+      <label>📧 Gmail</label>
+      <input type="text" id="dataGmail" placeholder="Nhập Gmail..." />
+    </div>
+    <div class="modal-actions" style="margin-top:14px;">
+      <button class="modal-btn-cancel" onclick="closeDataModal()">Huỷ</button>
+      <button class="modal-btn-confirm" onclick="saveAccountData()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL: DATA tài khoản -->
+<div class="modal-overlay" id="dataModal">
   <div class="modal-box" style="max-width: 420px;">
     <div class="modal-title">📝 Thông tin tài khoản</div>
     <div id="dataModalInfo" style="font-size:13px;color:#555;margin-bottom:12px;"></div>
-    <div style="display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;padding-right:2px;">
-      <div class="data-field-group">
-        <div class="data-field-label-row">
-          <label>👤 Tên tài khoản</label>
-          <button type="button" class="data-add-inline" onclick="addDataField('username')" title="Thêm dự phòng">+</button>
-        </div>
-        <div class="data-multi-list" id="dataUsernameList"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div>
+        <label style="font-size:13px;font-weight:600;color:#555;">👤 Tên tài khoản</label>
+        <input type="text" id="dataUsername" placeholder="Tên đăng nhập..." style="margin:4px 0;" />
       </div>
-      <div class="data-field-group">
-        <div class="data-field-label-row">
-          <label>📱 Số điện thoại</label>
-          <button type="button" class="data-add-inline" onclick="addDataField('phone')" title="Thêm dự phòng">+</button>
+      <div>
+        <label style="font-size:13px;font-weight:600;color:#555;">🔒 Mật khẩu</label>
+        <div style="position:relative;">
+          <input type="password" id="dataPassword" placeholder="Mật khẩu..." style="margin:4px 0;padding-right:42px;" />
+          <button class="api-eye-btn" onclick="toggleVisible('dataPassword','dataEye')" id="dataEye" style="right:4px;" title="Hiện/ẩn">👁️</button>
         </div>
-        <div class="data-multi-list" id="dataPhoneList"></div>
       </div>
-      <div class="data-field-group">
-        <div class="data-field-label-row">
-          <label>📧 Gmail</label>
-          <button type="button" class="data-add-inline" onclick="addDataField('gmail')" title="Thêm dự phòng">+</button>
-        </div>
-        <div class="data-multi-list" id="dataGmailList"></div>
+      <div>
+        <label style="font-size:13px;font-weight:600;color:#555;">🧑 Họ và Tên</label>
+        <input type="text" id="dataFullname" placeholder="Họ và tên..." style="margin:4px 0;" />
+      </div>
+      <div>
+        <label style="font-size:13px;font-weight:600;color:#555;">📱 Số điện thoại</label>
+        <input type="text" id="dataPhone" placeholder="Số điện thoại..." style="margin:4px 0;" />
+      </div>
+      <div>
+        <label style="font-size:13px;font-weight:600;color:#555;">📧 Gmail</label>
+        <input type="email" id="dataGmail" placeholder="example@gmail.com..." style="margin:4px 0;" />
       </div>
     </div>
     <div class="api-status-msg" id="dataStatusMsg" style="margin-top:10px;"></div>
