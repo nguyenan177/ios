@@ -199,7 +199,10 @@
     <div id="dataModalInfo" style="font-size:13px;color:#555;margin-bottom:12px;"></div>
     <div style="display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;padding-right:2px;">
       <div class="data-field-group">
-        <label style="font-size:13px;font-weight:600;color:#555;">👤 Tên tài khoản <button type="button" class="data-add-inline" onclick="addDataField('username')" title="Thêm dự phòng">+</button></label>
+        <div class="data-field-label-row">
+          <label>👤 Tên tài khoản</label>
+          <button type="button" class="data-add-inline" onclick="addDataField('username')" title="Thêm dự phòng">+</button>
+        </div>
         <div class="data-multi-list" id="dataUsernameList"></div>
       </div>
       <div>
@@ -211,11 +214,17 @@
         <input type="text" id="dataFullname" placeholder="Họ và tên..." style="margin:4px 0;" />
       </div>
       <div class="data-field-group">
-        <label style="font-size:13px;font-weight:600;color:#555;">📱 Số điện thoại <button type="button" class="data-add-inline" onclick="addDataField('phone')" title="Thêm dự phòng">+</button></label>
+        <div class="data-field-label-row">
+          <label>📱 Số điện thoại</label>
+          <button type="button" class="data-add-inline" onclick="addDataField('phone')" title="Thêm dự phòng">+</button>
+        </div>
         <div class="data-multi-list" id="dataPhoneList"></div>
       </div>
       <div class="data-field-group">
-        <label style="font-size:13px;font-weight:600;color:#555;">📧 Gmail <button type="button" class="data-add-inline" onclick="addDataField('gmail')" title="Thêm dự phòng">+</button></label>
+        <div class="data-field-label-row">
+          <label>📧 Gmail</label>
+          <button type="button" class="data-add-inline" onclick="addDataField('gmail')" title="Thêm dự phòng">+</button>
+        </div>
         <div class="data-multi-list" id="dataGmailList"></div>
       </div>
     </div>

@@ -29,6 +29,26 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
   }
 
   // ===========================
+  // TOAST: thông báo nhỏ hiện ngay trên trang (thay cho alert)
+  // ===========================
+  let toastEl = null;
+  let toastTimer = null;
+  window.showToast = function (msg) {
+    if (!toastEl) {
+      toastEl = document.createElement("div");
+      toastEl.className = "toast-notification";
+      document.body.appendChild(toastEl);
+    }
+    toastEl.textContent = msg;
+    clearTimeout(toastTimer);
+    // Force reflow để hiệu ứng lặp lại khi gọi liên tiếp
+    toastEl.classList.remove("show");
+    void toastEl.offsetWidth;
+    toastEl.classList.add("show");
+    toastTimer = setTimeout(() => { toastEl.classList.remove("show"); }, 1800);
+  };
+
+  // ===========================
   // ĐĂNG NHẬP NHANH (tài khoản đã lưu trên máy này)
   // ===========================
   const SAVED_ACCOUNTS_KEY = "savedAccounts";
@@ -509,12 +529,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
     gmail:    { listId: "dataGmailList",    type: "email", placeholder: "example@gmail.com..." }
   };
 
-  function makeMultiRow(key, value) {
+  function makeMultiRow(key, value, isBackup) {
     const cfg = MULTI_FIELDS[key];
+    const placeholder = isBackup ? "Dự phòng..." : cfg.placeholder;
     const row = document.createElement("div");
     row.className = "data-multi-row";
     row.innerHTML = `
-      <input type="${cfg.type}" data-field="${key}" placeholder="${cfg.placeholder}" />
+      <input type="${cfg.type}" data-field="${key}" placeholder="${placeholder}" />
       <button type="button" class="data-multi-remove" title="Xoá dòng này" onclick="removeDataField(this)">✕</button>
     `;
     row.querySelector("input").value = value || "";
@@ -526,12 +547,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
     const list = document.getElementById(cfg.listId);
     list.innerHTML = "";
     const vals = (values && values.length) ? values : [""];
-    vals.forEach(v => list.appendChild(makeMultiRow(key, v)));
+    vals.forEach((v, idx) => list.appendChild(makeMultiRow(key, v, idx > 0)));
   }
 
   window.addDataField = function(key) {
     const cfg = MULTI_FIELDS[key];
-    document.getElementById(cfg.listId).appendChild(makeMultiRow(key, ""));
+    document.getElementById(cfg.listId).appendChild(makeMultiRow(key, "", true));
   };
 
   window.removeDataField = function(btn) {
@@ -766,7 +787,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
     };
 
     window.copyText = async (text) => {
-      try { await navigator.clipboard.writeText(text); alert("Đã copy: " + text); } catch { alert("Không thể copy."); }
+      try { await navigator.clipboard.writeText(text); showToast("✅ Đã copy: " + text); } catch { showToast("❌ Không thể copy."); }
     };
 
     window.copyAll = async () => {
@@ -777,7 +798,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
         const tag = item.querySelector(".bank-tag")?.textContent.trim() || "";
         if (name && account && tag) lines.push(`${name} - ${account} - ${tag}`);
       });
-      try { await navigator.clipboard.writeText(lines.join("\n")); alert("Đã sao chép danh sách."); } catch { alert("Không thể sao chép."); }
+      try { await navigator.clipboard.writeText(lines.join("\n")); showToast("✅ Đã sao chép danh sách."); } catch { showToast("❌ Không thể sao chép."); }
     };
 
     window.deleteAccount = async (id) => {

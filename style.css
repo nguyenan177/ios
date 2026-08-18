@@ -226,8 +226,33 @@
 .data-multi-row input:focus { border-color: #2196F3; outline: none; }
 .data-multi-remove { flex-shrink: 0; width: 34px; height: 34px; margin: 0; padding: 0; background: #fdeaea; color: #c62828; border: 1.5px solid #f3b7b7; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
 .data-multi-remove:hover { background: #fadddd; }
-.data-add-btn { width: 100%; margin: 2px 0 0; background: #f0f7ff; border: 1.5px dashed #90caf9; border-radius: 8px; padding: 8px; font-size: 13px; font-weight: 600; color: #1565C0; cursor: pointer; }
-.data-add-btn:hover { background: #e3f0ff; }
+.data-add-inline { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin: 0; padding: 0; background: #f0f7ff; border: 1.5px solid #90caf9; border-radius: 6px; font-size: 13px; font-weight: 800; line-height: 1; color: #1565C0; cursor: pointer; flex-shrink: 0; }
+.data-add-inline:hover { background: #dbeeff; }
+.data-field-label-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.data-field-label-row label { font-size: 13px; font-weight: 600; color: #555; margin: 0; }
+
+/* Toast thông báo "Đã copy" */
+.toast-notification {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%) translateY(20px);
+  background: #263238;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+  z-index: 5000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.toast-notification.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
 .data-badge {
   display: inline-flex;
   align-items: center;
