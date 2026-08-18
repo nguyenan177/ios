@@ -199,30 +199,24 @@
     <div id="dataModalInfo" style="font-size:13px;color:#555;margin-bottom:12px;"></div>
     <div style="display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;padding-right:2px;">
       <div class="data-field-group">
-        <label style="font-size:13px;font-weight:600;color:#555;">👤 Tên tài khoản</label>
+        <label style="font-size:13px;font-weight:600;color:#555;">👤 Tên tài khoản <button type="button" class="data-add-inline" onclick="addDataField('username')" title="Thêm dự phòng">+</button></label>
         <div class="data-multi-list" id="dataUsernameList"></div>
-        <button type="button" class="data-add-btn" onclick="addDataField('username')">➕ Thêm tên tài khoản dự phòng</button>
       </div>
       <div>
         <label style="font-size:13px;font-weight:600;color:#555;">🔒 Mật khẩu</label>
-        <div style="position:relative;">
-          <input type="password" id="dataPassword" placeholder="Mật khẩu..." style="margin:4px 0;padding-right:42px;" />
-          <button class="api-eye-btn" onclick="toggleVisible('dataPassword','dataEye')" id="dataEye" style="right:4px;" title="Hiện/ẩn">👁️</button>
-        </div>
+        <input type="password" id="dataPassword" placeholder="Mật khẩu..." style="margin:4px 0;" />
       </div>
       <div>
         <label style="font-size:13px;font-weight:600;color:#555;">🧑 Họ và Tên</label>
         <input type="text" id="dataFullname" placeholder="Họ và tên..." style="margin:4px 0;" />
       </div>
       <div class="data-field-group">
-        <label style="font-size:13px;font-weight:600;color:#555;">📱 Số điện thoại</label>
+        <label style="font-size:13px;font-weight:600;color:#555;">📱 Số điện thoại <button type="button" class="data-add-inline" onclick="addDataField('phone')" title="Thêm dự phòng">+</button></label>
         <div class="data-multi-list" id="dataPhoneList"></div>
-        <button type="button" class="data-add-btn" onclick="addDataField('phone')">➕ Thêm số điện thoại dự phòng</button>
       </div>
       <div class="data-field-group">
-        <label style="font-size:13px;font-weight:600;color:#555;">📧 Gmail</label>
+        <label style="font-size:13px;font-weight:600;color:#555;">📧 Gmail <button type="button" class="data-add-inline" onclick="addDataField('gmail')" title="Thêm dự phòng">+</button></label>
         <div class="data-multi-list" id="dataGmailList"></div>
-        <button type="button" class="data-add-btn" onclick="addDataField('gmail')">➕ Thêm Gmail dự phòng</button>
       </div>
     </div>
     <div class="api-status-msg" id="dataStatusMsg" style="margin-top:10px;"></div>
