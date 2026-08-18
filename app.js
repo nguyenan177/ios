@@ -573,19 +573,25 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
   }
 
   window.openDataModal = async function(accountId) {
-    currentDataAccountId = accountId;
-    const acc = allAccounts.find(a => a.id === accountId);
-    document.getElementById("dataModalInfo").textContent = acc ? `📌 ${acc.data.name} — ${acc.data.account}` : "";
+    try {
+      currentDataAccountId = accountId;
+      const acc = allAccounts.find(a => a.id === accountId);
+      document.getElementById("dataModalInfo").textContent = acc ? `📌 ${acc.data.name} — ${acc.data.account}` : "";
 
-    // Reset form
-    renderMultiField("username", []);
-    renderMultiField("phone", []);
-    renderMultiField("gmail", []);
-    document.getElementById("dataStatusMsg").textContent = "";
-    document.getElementById("dataStatusMsg").className = "api-status-msg";
+      // Reset form
+      renderMultiField("username", []);
+      renderMultiField("phone", []);
+      renderMultiField("gmail", []);
+      document.getElementById("dataStatusMsg").textContent = "";
+      document.getElementById("dataStatusMsg").className = "api-status-msg";
 
-    // Mở modal ngay lập tức, không chờ fetch dữ liệu (tránh cảm giác bấm chậm)
-    document.getElementById("dataModal").classList.add("open");
+      // Mở modal ngay lập tức, không chờ fetch dữ liệu (tránh cảm giác bấm chậm)
+      document.getElementById("dataModal").classList.add("open");
+    } catch(e) {
+      console.error("Lỗi mở modal DATA:", e);
+      alert("Lỗi mở modal DATA: " + e.message);
+      return;
+    }
 
     // Load existing data (chạy nền, cập nhật form khi có kết quả)
     try {
