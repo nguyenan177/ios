@@ -502,17 +502,66 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
   // ===========================
   // MODAL: DATA tài khoản
   // ===========================
+  // Cấu hình các trường hỗ trợ nhiều giá trị (dự phòng) qua nút "+"
+  const MULTI_FIELDS = {
+    username: { listId: "dataUsernameList", type: "text",  placeholder: "Tên đăng nhập..." },
+    phone:    { listId: "dataPhoneList",    type: "text",  placeholder: "Số điện thoại..." },
+    gmail:    { listId: "dataGmailList",    type: "email", placeholder: "example@gmail.com..." }
+  };
+
+  function makeMultiRow(key, value) {
+    const cfg = MULTI_FIELDS[key];
+    const row = document.createElement("div");
+    row.className = "data-multi-row";
+    row.innerHTML = `
+      <input type="${cfg.type}" data-field="${key}" placeholder="${cfg.placeholder}" />
+      <button type="button" class="data-multi-remove" title="Xoá dòng này" onclick="removeDataField(this)">✕</button>
+    `;
+    row.querySelector("input").value = value || "";
+    return row;
+  }
+
+  function renderMultiField(key, values) {
+    const cfg = MULTI_FIELDS[key];
+    const list = document.getElementById(cfg.listId);
+    list.innerHTML = "";
+    const vals = (values && values.length) ? values : [""];
+    vals.forEach(v => list.appendChild(makeMultiRow(key, v)));
+  }
+
+  window.addDataField = function(key) {
+    const cfg = MULTI_FIELDS[key];
+    document.getElementById(cfg.listId).appendChild(makeMultiRow(key, ""));
+  };
+
+  window.removeDataField = function(btn) {
+    const row = btn.closest(".data-multi-row");
+    const list = row.parentElement;
+    if (list.children.length <= 1) {
+      // Luôn giữ lại ít nhất 1 dòng, chỉ xoá nội dung
+      row.querySelector("input").value = "";
+      return;
+    }
+    row.remove();
+  };
+
+  function collectMultiField(key) {
+    const cfg = MULTI_FIELDS[key];
+    const inputs = document.querySelectorAll(`#${cfg.listId} input[data-field="${key}"]`);
+    return [...inputs].map(i => i.value.trim()).filter(v => v);
+  }
+
   window.openDataModal = async function(accountId) {
     currentDataAccountId = accountId;
     const acc = allAccounts.find(a => a.id === accountId);
     document.getElementById("dataModalInfo").textContent = acc ? `📌 ${acc.data.name} — ${acc.data.account}` : "";
 
     // Reset form
-    document.getElementById("dataUsername").value = "";
+    renderMultiField("username", []);
     document.getElementById("dataPassword").value = "";
     document.getElementById("dataFullname").value = "";
-    document.getElementById("dataPhone").value = "";
-    document.getElementById("dataGmail").value = "";
+    renderMultiField("phone", []);
+    renderMultiField("gmail", []);
     document.getElementById("dataStatusMsg").textContent = "";
     document.getElementById("dataStatusMsg").className = "api-status-msg";
 
@@ -521,11 +570,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
       const snap = await getDoc(doc(db, "accountData", accountId));
       if (snap.exists()) {
         const d = snap.data();
-        document.getElementById("dataUsername").value = d.username || "";
+        // Ưu tiên mảng usernames/phones/gmails (dự phòng); tương thích ngược với dữ liệu cũ dạng chuỗi đơn
+        renderMultiField("username", d.usernames && d.usernames.length ? d.usernames : (d.username ? [d.username] : []));
         document.getElementById("dataPassword").value = d.password || "";
         document.getElementById("dataFullname").value = d.fullname || "";
-        document.getElementById("dataPhone").value = d.phone || "";
-        document.getElementById("dataGmail").value = d.gmail || "";
+        renderMultiField("phone", d.phones && d.phones.length ? d.phones : (d.phone ? [d.phone] : []));
+        renderMultiField("gmail", d.gmails && d.gmails.length ? d.gmails : (d.gmail ? [d.gmail] : []));
       }
     } catch(e) { console.warn("Không tải được data:", e); }
 
@@ -539,12 +589,19 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 
   window.saveAccountData = async function() {
     if (!currentDataAccountId) return;
+    const usernames = collectMultiField("username");
+    const phones = collectMultiField("phone");
+    const gmails = collectMultiField("gmail");
     const payload = {
-      username: document.getElementById("dataUsername").value.trim(),
+      usernames,
+      phones,
+      gmails,
+      // Giữ thêm field đơn (giá trị đầu tiên) để tương thích với nơi khác còn đọc field cũ
+      username: usernames[0] || "",
+      phone: phones[0] || "",
+      gmail: gmails[0] || "",
       password: document.getElementById("dataPassword").value.trim(),
       fullname: document.getElementById("dataFullname").value.trim(),
-      phone: document.getElementById("dataPhone").value.trim(),
-      gmail: document.getElementById("dataGmail").value.trim(),
       updatedAt: serverTimestamp()
     };
     const btn = document.querySelector('#dataModal .modal-btn-confirm');

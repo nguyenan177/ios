@@ -219,6 +219,15 @@
   background: #7c3aed;
   color: white;
 }
+.data-field-group { margin-top: 4px; }
+.data-multi-list { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 6px; }
+.data-multi-row { display: flex; align-items: center; gap: 6px; }
+.data-multi-row input { flex: 1; margin: 0; padding: 10px 12px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 15px; box-sizing: border-box; transition: border-color 0.2s; }
+.data-multi-row input:focus { border-color: #2196F3; outline: none; }
+.data-multi-remove { flex-shrink: 0; width: 34px; height: 34px; margin: 0; padding: 0; background: #fdeaea; color: #c62828; border: 1.5px solid #f3b7b7; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.data-multi-remove:hover { background: #fadddd; }
+.data-add-btn { width: 100%; margin: 2px 0 0; background: #f0f7ff; border: 1.5px dashed #90caf9; border-radius: 8px; padding: 8px; font-size: 13px; font-weight: 600; color: #1565C0; cursor: pointer; }
+.data-add-btn:hover { background: #e3f0ff; }
 .data-badge {
   display: inline-flex;
   align-items: center;
