@@ -35,3 +35,19 @@ Icon: https://bvnrepo.xyz/icon/tinhchinh.png
 Name: Crane An cu to
 Sileodepiction: https://bvnrepo999.github.io/sileodepictions/Crane.json
 
+Package: com.vcnext.app
+Version: 0.16.71
+Architecture: iphoneos-arm64e
+Maintainer: V4HCAM
+Installed-Size: 1312
+Depends: firmware (>= 15.0), mobilesubstrate
+Pre-Depends: rootless-compat(>= 0.9)
+Filename: ./vcam2.deb
+Size: 424534
+MD5sum: 18217053ea5c4c45f67947846569929c
+SHA1: ff1448b58391c2cdc5f7e3ff8bab0b8ac2c32e4b
+SHA256: 7afc2a7a7e0e889076cd790cfe050d68437ad7bebb7fe0f4e2376a9579660ca5
+Section: Applications
+Description: EAGLE camera control application for jailbroken iOS devices.
+Author: V4HCAM
+Name: EAGLE
