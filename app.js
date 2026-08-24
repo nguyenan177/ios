@@ -3,6 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
     getFirestore, collection, addDoc, onSnapshot, serverTimestamp,
     orderBy, query, deleteDoc, doc, updateDoc, getDoc, setDoc, getDocs
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
 
   // ===== Firebase TRUNG TÂM: chỉ dùng để xác thực đăng nhập (username/password/config riêng của mỗi người) =====
   const centralConfig = {
@@ -16,6 +17,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
   };
   const centralApp = initializeApp(centralConfig, "central");
   const centralDb = getFirestore(centralApp);
+
+  // ===== App Check: bắt buộc để Firestore Rules có thể kiểm tra "request.app != null" =====
+  // Thay "RECAPTCHA_SITE_KEY_CENTRAL" bằng site key thật lấy ở:
+  // Firebase Console > project toolreg > App Check > Apps > (chọn web app) > reCAPTCHA v3
+  initializeAppCheck(centralApp, {
+    provider: new ReCaptchaV3Provider("6LdVy5UtAAAAABpN5rvOl_GZpkeiR6jckr0PB9un"),
+    isTokenAutoRefreshEnabled: true,
+  });
 
   async function sha256(text) {
     const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
