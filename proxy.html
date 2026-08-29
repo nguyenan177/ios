@@ -43,7 +43,7 @@
     border-radius:8px; padding:8px 10px; font-size:13px; outline:none;
   }
   input:focus, select:focus{border-color:var(--primary);}
-  input#apiKey{min-width:320px; flex:1;}
+  input#apiKey, input#tokenInput{min-width:320px; flex:1;}
 
   button{
     background:var(--surface-2); border:1px solid var(--border); color:var(--text);
@@ -62,6 +62,13 @@
   html[data-theme="light"] button:hover{background:#eef1f6;}
   html[data-theme="light"] button.primary:hover{background:#1d4ed8;}
   button.ghost{background:transparent;}
+
+  .tabs{display:flex; gap:6px; margin-bottom:12px;}
+  .tab{
+    padding:6px 14px; border-radius:8px; border:1px solid var(--border);
+    background:var(--surface-2); color:var(--muted); cursor:pointer; font-size:13px;
+  }
+  .tab.active{background:var(--primary); border-color:var(--primary); color:var(--primary-fg);}
 
   .badge{
     display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:500;
@@ -141,16 +148,27 @@
   </div>
   <div class="row" style="gap:8px;">
     <button class="ghost" id="themeToggleBtn" title="Chuyển giao diện sáng/tối">🌙</button>
-    <button class="ghost" id="clearKeyBtn" title="Xóa API Key đã lưu">Đăng xuất</button>
+    <button class="ghost" id="clearKeyBtn" title="Đăng xuất">Đăng xuất</button>
   </div>
 </header>
 
 <main>
   <div class="card">
-    <div class="row">
+    <div class="tabs">
+      <div class="tab active" id="tabToken">Token (từ Bot Telegram)</div>
+      <div class="tab" id="tabApiKey">API Key (quản trị)</div>
+    </div>
+
+    <div class="row" id="tokenRow">
+      <input id="tokenInput" type="text" placeholder="Nhập token nhận từ bot (vd: 875AAFXDNY)..." />
+      <button class="primary" id="tokenConnectBtn">Xem proxy</button>
+    </div>
+
+    <div class="row" id="apiKeyRow" style="display:none;">
       <input id="apiKey" type="password" placeholder="Nhập API Key (x-api-key)..." />
       <button class="primary" id="connectBtn">Kết nối</button>
     </div>
+
     <div id="keyInfo" class="muted" style="margin-top:10px; font-size:12.5px;"></div>
   </div>
 
@@ -202,8 +220,14 @@
 
 <script>
 const API_BASE = "https://tsproxy.com/api/public";
+const WORKER_BASE = "https://botbanproxy.asapkute.workers.dev";
 const AUTO_RELOAD_SECONDS = 3;
-const state = { apiKey: "", devices: [], currentDeviceId: "", proxies: [], authTarget: null };
+const state = {
+  mode: "token", // "token" | "apikey"
+  apiKey: "", token: "",
+  devices: [], currentDeviceId: "",
+  proxies: [], authTarget: null
+};
 let autoReloadTimer = null;
 let countdownTimer = null;
 let secondsLeft = AUTO_RELOAD_SECONDS;
@@ -230,6 +254,15 @@ function toggleTheme() {
   applyTheme(current === "light" ? "dark" : "light");
 }
 
+function setMode(mode) {
+  state.mode = mode;
+  $("tabToken").classList.toggle("active", mode === "token");
+  $("tabApiKey").classList.toggle("active", mode === "apikey");
+  $("tokenRow").style.display = mode === "token" ? "flex" : "none";
+  $("apiKeyRow").style.display = mode === "apikey" ? "flex" : "none";
+}
+
+// ---- TSProxy trực tiếp (chế độ API Key - quản trị) ----
 async function api(path, opts = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     ...opts,
@@ -245,6 +278,23 @@ async function api(path, opts = {}) {
     throw new Error(json.message || `Lỗi ${res.status}`);
   }
   return json.data;
+}
+
+// ---- Worker (chế độ Token - từ bot Telegram) ----
+async function tokenApi(path, opts = {}) {
+  const res = await fetch(`${WORKER_BASE}${path}`, {
+    ...opts,
+    headers: {
+      "Content-Type": "application/json",
+      ...(opts.headers || {}),
+    },
+  });
+  let json;
+  try { json = await res.json(); } catch { json = {}; }
+  if (!res.ok || json.error) {
+    throw new Error(json.error || `Lỗi ${res.status}`);
+  }
+  return json;
 }
 
 function formatHttpRemote(p) {
@@ -303,6 +353,7 @@ function renderProxies() {
       <span>Không có proxy nào</span></div></td></tr>`;
     return;
   }
+  const showAdminActions = state.mode === "apikey";
   body.innerHTML = state.proxies.map(p => {
     const httpPill = formatHttpRemote(p);
     const sockPill = formatSockRemote(p);
@@ -324,8 +375,9 @@ function renderProxies() {
       <td>
         <div class="actions">
           <button class="rotate-btn" data-id="${p.id}" title="Xoay IP">⟳ Xoay IP</button>
+          ${showAdminActions ? `
           <button class="auth-btn" data-id="${p.id}" title="Đổi xác thực">🔑 Auth</button>
-          <button class="danger stop-btn" data-id="${p.id}" title="Tạm dừng">⏸ Dừng</button>
+          <button class="danger stop-btn" data-id="${p.id}" title="Tạm dừng">⏸ Dừng</button>` : ""}
         </div>
       </td>
     </tr>
@@ -371,13 +423,19 @@ function startAutoReload() {
 }
 
 async function loadProxies() {
-  if (!state.currentDeviceId) return;
   $("tableCard").style.display = "block";
   isReloading = true;
   const btn = $("reloadBtn");
   if (btn) btn.innerHTML = `<span class="spin">↻</span> Đang tải...`;
   try {
-    state.proxies = await api(`/proxy-list/${state.currentDeviceId}`);
+    if (state.mode === "token") {
+      if (!state.token) return;
+      const data = await tokenApi(`/api/token/${state.token}`);
+      state.proxies = data.proxies || [];
+    } else {
+      if (!state.currentDeviceId) return;
+      state.proxies = await api(`/proxy-list/${state.currentDeviceId}`);
+    }
     renderProxies();
   } catch (e) {
     toast(e.message, "err");
@@ -388,9 +446,35 @@ async function loadProxies() {
   }
 }
 
+async function connectToken() {
+  const token = $("tokenInput").value.trim();
+  if (!token) { toast("Vui lòng nhập token", "err"); return; }
+  state.mode = "token";
+  state.token = token;
+  $("tokenConnectBtn").disabled = true;
+  $("tokenConnectBtn").textContent = "Đang tải...";
+  try {
+    const data = await tokenApi(`/api/token/${token}`);
+    state.proxies = data.proxies || [];
+    localStorage.setItem("tsproxy_token", token);
+    $("keyInfo").textContent = `Token ${token} · ${state.proxies.length} proxy`;
+    $("deviceLabel").textContent = "dung.songcho.click";
+    renderProxies();
+    $("tableCard").style.display = "block";
+    startAutoReload();
+    toast("Đã tải proxy từ token", "ok");
+  } catch (e) {
+    toast(e.message, "err");
+  } finally {
+    $("tokenConnectBtn").disabled = false;
+    $("tokenConnectBtn").textContent = "Xem proxy";
+  }
+}
+
 async function connect() {
   const key = $("apiKey").value.trim();
   if (!key) { toast("Vui lòng nhập API Key", "err"); return; }
+  state.mode = "apikey";
   state.apiKey = key;
   $("connectBtn").disabled = true;
   $("connectBtn").textContent = "Đang kết nối...";
@@ -418,7 +502,11 @@ async function rotateProxy(proxyId) {
   const prevIp = prevProxy?.ipPublic || "";
   if (btn) { btn.disabled = true; btn.innerHTML = `<span class="spin">⟳</span> Đang xoay...`; }
   try {
-    await api(`/rotate-proxy/${state.currentDeviceId}/${proxyId}`, { method: "POST" });
+    if (state.mode === "token") {
+      await tokenApi(`/api/token/${state.token}/rotate/${proxyId}`, { method: "POST" });
+    } else {
+      await api(`/rotate-proxy/${state.currentDeviceId}/${proxyId}`, { method: "POST" });
+    }
     const gotNewIp = await waitForNewIp(proxyId, prevIp);
     toast(gotNewIp ? "Đã xoay IP thành công" : "Đã gửi lệnh xoay IP (đang chờ IP mới...)", gotNewIp ? "ok" : "err");
   } catch (e) {
@@ -435,7 +523,13 @@ async function waitForNewIp(proxyId, prevIp, timeoutMs = 30000, intervalMs = 200
   while (Date.now() - start < timeoutMs) {
     await new Promise(r => setTimeout(r, intervalMs));
     try {
-      const list = await api(`/proxy-list/${state.currentDeviceId}`);
+      let list;
+      if (state.mode === "token") {
+        const data = await tokenApi(`/api/token/${state.token}`);
+        list = data.proxies || [];
+      } else {
+        list = await api(`/proxy-list/${state.currentDeviceId}`);
+      }
       const p = list.find(x => String(x.id) === String(proxyId));
       if (p && p.ipPublic && p.ipPublic !== prevIp) {
         state.proxies = list;
@@ -483,14 +577,18 @@ async function saveAuth() {
 }
 
 $("connectBtn").onclick = connect;
+$("tokenConnectBtn").onclick = connectToken;
+$("tabToken").onclick = () => setMode("token");
+$("tabApiKey").onclick = () => setMode("apikey");
 $("reloadBtn").onclick = () => { loadProxies(); startAutoReload(); };
 $("authCancelBtn").onclick = closeAuthModal;
 $("authSaveBtn").onclick = saveAuth;
 $("themeToggleBtn").onclick = toggleTheme;
 $("clearKeyBtn").onclick = () => {
   localStorage.removeItem("tsproxy_key");
-  state.apiKey = ""; state.devices = []; state.currentDeviceId = ""; state.proxies = [];
-  $("apiKey").value = ""; $("keyInfo").textContent = "";
+  localStorage.removeItem("tsproxy_token");
+  state.apiKey = ""; state.token = ""; state.devices = []; state.currentDeviceId = ""; state.proxies = [];
+  $("apiKey").value = ""; $("tokenInput").value = ""; $("keyInfo").textContent = "";
   $("deviceLabel").textContent = ""; $("tableCard").style.display = "none";
   stopAutoReload();
   toast("Đã đăng xuất");
@@ -500,7 +598,7 @@ $("clearKeyBtn").onclick = () => {
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     stopAutoReload();
-  } else if (state.currentDeviceId) {
+  } else if (state.currentDeviceId || state.token) {
     startAutoReload();
   }
 });
@@ -508,9 +606,18 @@ document.addEventListener("visibilitychange", () => {
 // load saved theme (defaults to dark)
 applyTheme(localStorage.getItem("tsproxy_theme") || "dark");
 
-// auto-load saved key
-const saved = localStorage.getItem("tsproxy_key");
-if (saved) { $("apiKey").value = saved; connect(); }
+// auto-load saved token/key
+setMode("token");
+const savedToken = localStorage.getItem("tsproxy_token");
+const savedKey = localStorage.getItem("tsproxy_key");
+if (savedToken) {
+  $("tokenInput").value = savedToken;
+  connectToken();
+} else if (savedKey) {
+  setMode("apikey");
+  $("apiKey").value = savedKey;
+  connect();
+}
 </script>
 </body>
 </html>
