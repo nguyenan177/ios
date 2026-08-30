@@ -588,8 +588,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 
     // Reset form
     renderMultiField("username", []);
-    document.getElementById("dataPassword").value = "";
-    document.getElementById("dataFullname").value = "";
     renderMultiField("phone", []);
     renderMultiField("gmail", []);
     document.getElementById("dataStatusMsg").textContent = "";
@@ -602,8 +600,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
         const d = snap.data();
         // Ưu tiên mảng usernames/phones/gmails (dự phòng); tương thích ngược với dữ liệu cũ dạng chuỗi đơn
         renderMultiField("username", d.usernames && d.usernames.length ? d.usernames : (d.username ? [d.username] : []));
-        document.getElementById("dataPassword").value = d.password || "";
-        document.getElementById("dataFullname").value = d.fullname || "";
         renderMultiField("phone", d.phones && d.phones.length ? d.phones : (d.phone ? [d.phone] : []));
         renderMultiField("gmail", d.gmails && d.gmails.length ? d.gmails : (d.gmail ? [d.gmail] : []));
       }
@@ -630,8 +626,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
       username: usernames[0] || "",
       phone: phones[0] || "",
       gmail: gmails[0] || "",
-      password: document.getElementById("dataPassword").value.trim(),
-      fullname: document.getElementById("dataFullname").value.trim(),
       updatedAt: serverTimestamp()
     };
     const btn = document.querySelector('#dataModal .modal-btn-confirm');
