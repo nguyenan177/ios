@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Cài đặt ThandieuAPP</title>
+<title>ThandieuAPP</title>
 <style>
   :root {
     --ink-deep: #1e1b4b;
@@ -48,7 +48,26 @@
   .ver {
     font-size: 14px;
     color: rgba(247,244,236,0.65);
-    margin: 0 0 30px;
+    margin: 0 0 28px;
+  }
+  .urlbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,0,0,0.22);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+  .urlbox span {
+    flex: 1;
+    font-size: 12.5px;
+    text-align: left;
+    word-break: break-all;
+    color: rgba(247,244,236,0.85);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    line-height: 1.4;
   }
   .btn {
     display: block;
@@ -58,25 +77,19 @@
     border: none;
     font-size: 17px;
     font-weight: 600;
-    text-decoration: none;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-  }
-  .btn-primary {
     background: linear-gradient(135deg, var(--gold), var(--fire));
     color: #1a1200;
     box-shadow: 0 10px 24px rgba(236,72,34,0.35);
-    margin-bottom: 12px;
   }
-  .btn-primary:active { transform: scale(0.98); }
-  .btn-secondary {
-    background: rgba(255,255,255,0.08);
-    color: var(--paper);
-    border: 1px solid var(--line);
-    font-weight: 500;
-    font-size: 15px;
+  .btn:active { transform: scale(0.98); }
+  .status {
+    margin-top: 14px;
+    font-size: 13px;
+    min-height: 18px;
+    color: var(--gold);
   }
-  .btn-secondary:active { background: rgba(255,255,255,0.14); }
   .hint {
     margin-top: 22px;
     font-size: 13px;
@@ -89,12 +102,6 @@
     padding: 14px 16px;
   }
   .hint b { color: rgba(247,244,236,0.9); }
-  .status {
-    margin-top: 14px;
-    font-size: 13px;
-    min-height: 18px;
-    color: var(--gold);
-  }
 </style>
 </head>
 <body>
@@ -104,35 +111,40 @@
     <h1>ThandieuAPP</h1>
     <p class="ver">Phiên bản 2.3.6 · Việt hóa</p>
 
-    <a class="btn btn-primary" id="installBtn" href="#">Cài đặt qua TrollStore</a>
-    <a class="btn btn-secondary" id="fileBtn" href="#">Tải file .tipa</a>
+    <div class="urlbox">
+      <span id="urlText">https://pub-f225fc4c925f4cad963c543c3378b1ae.r2.dev/ThandieuAPP-v2_3_6-1.tipa</span>
+    </div>
 
+    <button class="btn" id="copyBtn">Sao chép link</button>
     <div class="status" id="status"></div>
 
     <div class="hint">
-      <b>Trước khi cài:</b> mở TrollStore → Settings → bật <b>"Enable URL Scheme"</b>.<br><br>
-      Nhấn <b>"Cài đặt qua TrollStore"</b> sẽ tự mở TrollStore và bắt đầu tải + cài. Nếu không thấy TrollStore bật lên, dùng nút <b>"Tải file .tipa"</b> rồi mở bằng TrollStore thủ công.
+      Mở <b>TrollStore</b> → bấm nút <b>"+"</b> → chọn <b>"Install from URL"</b> → dán link vừa sao chép → nhấn <b>Install</b>.
     </div>
   </div>
 </div>
 
 <script>
-  var TIPA_URL = "https://pub-f225fc4c925f4cad963c543c3378b1ae.r2.dev/ThandieuAPP-v2_3_6-1.tipa";
-
-  var installBtn = document.getElementById("installBtn");
-  var fileBtn = document.getElementById("fileBtn");
+  var url = document.getElementById("urlText").textContent;
   var status = document.getElementById("status");
 
-  fileBtn.href = TIPA_URL;
-
-  installBtn.addEventListener("click", function(e){
-    e.preventDefault();
-    var scheme = "apple-magnifier://install?url=" + encodeURIComponent(TIPA_URL);
-    status.textContent = "Đang mở TrollStore…";
-    window.location.href = scheme;
-    setTimeout(function(){
-      status.textContent = "Không thấy TrollStore mở? Bấm "Tải file .tipa" bên dưới rồi mở bằng TrollStore.";
-    }, 2500);
+  document.getElementById("copyBtn").addEventListener("click", function(){
+    function done(ok){
+      status.textContent = ok ? "Đã sao chép!" : "Sao chép thất bại, hãy tự chọn và copy.";
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function(){ done(true); }).catch(function(){ done(false); });
+    } else {
+      var ta = document.createElement("textarea");
+      ta.value = url;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try { document.execCommand("copy"); done(true); } catch(e){ done(false); }
+      document.body.removeChild(ta);
+    }
   });
 </script>
 </body>
