@@ -3,230 +3,284 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>📋 Quản lý tài khoản (Firebase)</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+<title>Quản lý tài khoản</title>
+
+<!-- ===== Chống AI crawler / indexer (áp dụng cho GitHub Pages) ===== -->
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, noai, noimageai" />
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet" />
+<meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet" />
+<meta name="referrer" content="no-referrer" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="color-scheme" content="light dark" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- ===== Icon sprite ===== -->
+<svg class="sprite" aria-hidden="true">
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2m-4 4 3 3m-6-1 2 2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+  <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></symbol>
+  <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 22h18M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 2 3 7h18z"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></symbol>
+</svg>
 
+<!-- =========================== LOGIN =========================== -->
 <div id="loginView">
   <div class="auth-box">
-    <h2>🔐 Đăng nhập</h2>
+    <div class="brand">
+      <div class="brand-mark"><svg class="i"><use href="#i-shield"/></svg></div>
+      <h2>Đăng nhập</h2>
+      <p>Quản lý tài khoản ngân hàng an toàn</p>
+    </div>
 
     <div class="quick-login-box" id="quickLoginBox" style="display:none;">
-      <div class="quick-login-heading">⚡ Đăng nhập nhanh</div>
+      <div class="quick-login-heading">Đăng nhập nhanh</div>
       <div id="quickAccountsList"></div>
-      <div class="divider-or">hoặc đăng nhập bằng tài khoản khác</div>
+      <div class="divider-or">hoặc dùng tài khoản khác</div>
     </div>
 
-    <label>👤 Tên đăng nhập</label>
-    <input type="text" id="loginUsername" placeholder="Nhập tên đăng nhập..." autocomplete="username" />
-    <label>🔒 Mật khẩu</label>
-    <input type="password" id="loginPassword" placeholder="Nhập mật khẩu..." autocomplete="current-password" />
+    <label for="loginUsername">Tên đăng nhập</label>
+    <div class="field-icon">
+      <svg class="i"><use href="#i-user"/></svg>
+      <input type="text" id="loginUsername" placeholder="Nhập tên đăng nhập" autocomplete="username" />
+    </div>
+
+    <label for="loginPassword">Mật khẩu</label>
+    <div class="field-icon">
+      <svg class="i"><use href="#i-lock"/></svg>
+      <input type="password" id="loginPassword" placeholder="Nhập mật khẩu" autocomplete="current-password" />
+    </div>
+
     <div class="remember-row">
       <input type="checkbox" id="rememberAccount" checked />
-      <label for="rememberAccount" style="margin:0;">💾 Ghi nhớ để đăng nhập nhanh lần sau</label>
+      <label for="rememberAccount">Ghi nhớ để đăng nhập nhanh lần sau</label>
     </div>
+
     <button class="submit" id="btnLogin" onclick="doLogin()">Đăng nhập</button>
     <div class="msg" id="loginMsg"></div>
   </div>
 </div>
 
-
+<!-- =========================== MANAGER =========================== -->
 <div id="managerView" style="display:none;">
-<div class="topbar">
-  <div class="who"><span class="dot"></span> <span id="whoUser">—</span></div>
-  <button onclick="doLogout()">🚪 Đăng xuất</button>
-</div>
 
-<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-  <h2 style="display: flex; align-items: center; gap: 8px; margin: 0;">📋 Danh sách tài khoản</h2>
-  <div style="font-size: 15px; font-weight: 500;">Tổng Bank: <span id="totalCount">0</span></div>
-</div>
-
-<!-- ⚙️ API SETTINGS PANEL -->
-<div class="api-settings-panel" id="apiSettingsPanel">
-  <div class="api-settings-header" onclick="toggleApiPanel()">
-    <div class="api-settings-header-left">
-      <span class="icon">⚙️</span>
-      Cài đặt API & Hệ thống
-      <span class="api-saved-indicator" id="apiSavedDot" title="Đã lưu cài đặt"></span>
-    </div>
-    <button class="api-settings-toggle" id="apiToggleBtn" onclick="event.stopPropagation(); toggleApiPanel()">▼ Mở</button>
+  <div class="topbar">
+    <div class="who"><span class="dot"></span> <span id="whoUser">—</span></div>
+    <button onclick="doLogout()"><svg class="i"><use href="#i-logout"/></svg> Đăng xuất</button>
   </div>
-  <div class="api-settings-body" id="apiSettingsBody">
-    <div class="api-section-heading">🔑 API Keys</div>
-    <div class="api-field-label">🔑 API Key chính <span class="badge badge-blue">DEFAULT_API_KEY</span></div>
-    <div class="api-input-wrap">
-      <input type="password" id="inputApiKey" placeholder="Nhập API Key..." autocomplete="off" />
-      <button class="api-eye-btn" onclick="toggleVisible('inputApiKey', 'eye1')" id="eye1" title="Hiện/ẩn">👁️</button>
-    </div>
-    <div class="api-field-label" style="margin-top:10px;">🤖 Captcha API Key <span class="badge badge-blue">DEFAULT_CAPTCHA_API_KEY</span></div>
-    <div class="api-input-wrap">
-      <input type="password" id="inputCaptchaKey" placeholder="Nhập Captcha API Key..." autocomplete="off" />
-      <button class="api-eye-btn" onclick="toggleVisible('inputCaptchaKey', 'eye2')" id="eye2" title="Hiện/ẩn">👁️</button>
-    </div>
-    <div class="api-section-heading" style="margin-top:18px;">🔒 Mật khẩu hệ thống</div>
-    <div class="api-field-label">🔑 Mật khẩu đăng ký <span class="badge badge-orange">PASSWORD</span></div>
-    <div class="api-input-wrap">
-      <input type="password" id="inputPassword" placeholder="Nhập mật khẩu đăng ký..." autocomplete="new-password" />
-      <button class="api-eye-btn" onclick="toggleVisible('inputPassword', 'eye3')" id="eye3" title="Hiện/ẩn">👁️</button>
-    </div>
-    <div class="api-field-label" style="margin-top:10px;">🔒 Mật khẩu rút tiền <span class="badge badge-orange">WITHDRAW_PASSWORD</span></div>
-    <div class="api-input-wrap">
-      <input type="password" id="inputWithdrawPassword" placeholder="Nhập mật khẩu rút tiền..." autocomplete="new-password" />
-      <button class="api-eye-btn" onclick="toggleVisible('inputWithdrawPassword', 'eye4')" id="eye4" title="Hiện/ẩn">👁️</button>
-    </div>
-    <div class="api-section-heading" style="margin-top:18px;">📱 Telegram</div>
-    <div class="api-field-label">💬 Telegram Chat ID <span class="badge badge-teal">TG_CHATID</span></div>
-    <input type="text" id="inputTgChatId" class="api-input-plain" placeholder="Nhập Telegram Chat ID..." autocomplete="off" />
-    <div class="api-actions">
-      <button class="api-btn-save" onclick="saveApiKeys()">💾 Lưu tất cả cài đặt</button>
-      <button class="api-btn-reset" onclick="resetApiKeys()">🔄 Reset</button>
-    </div>
-    <div class="api-status-msg" id="apiStatusMsg"></div>
-    <div style="margin-top:10px;">
-      <button onclick="showActiveKeys()" style="width:100%;background:#f0f7ff;border:1.5px solid #90caf9;border-radius:8px;padding:9px;font-size:14px;font-weight:600;color:#1565C0;cursor:pointer;margin:0;">
-        🔍 Xem cài đặt đang hoạt động
-      </button>
-    </div>
-    <div class="active-key-box" id="activeKeyBox" style="display:none;">
-      <div class="active-key-row"><span class="active-key-label">🔑 API Key:</span><span class="active-key-val" id="activeApiKeyVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activeApiKeyVal')">📋 Copy</button></div>
-      <div class="active-key-row"><span class="active-key-label">🤖 Captcha:</span><span class="active-key-val" id="activeCaptchaKeyVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activeCaptchaKeyVal')">📋 Copy</button></div>
-      <div class="active-key-row"><span class="active-key-label">🔑 MK Đăng ký:</span><span class="active-key-val" id="activePasswordVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activePasswordVal')">📋 Copy</button></div>
-      <div class="active-key-row"><span class="active-key-label">🔒 MK Rút tiền:</span><span class="active-key-val" id="activeWithdrawVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activeWithdrawVal')">📋 Copy</button></div>
-      <div class="active-key-row"><span class="active-key-label">💬 TG Chat ID:</span><span class="active-key-val" id="activeTgChatIdVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activeTgChatIdVal')">📋 Copy</button></div>
-    </div>
-  </div>
-</div>
 
-<!-- 👥 GROUPS PANEL -->
-<div class="group-panel" id="groupPanel">
-  <div class="group-panel-header" onclick="toggleGroupPanel()">
-    <div class="group-panel-header-left">
-      <span style="font-size:20px;">👥</span>
-      Quản lý nhóm
-      <span id="groupCountBadge" style="font-size:12px;background:#7c3aed;color:white;border-radius:20px;padding:1px 9px;font-weight:700;">0</span>
-    </div>
-    <button class="group-panel-toggle" id="groupToggleBtn" onclick="event.stopPropagation(); toggleGroupPanel()">▼ Mở</button>
+  <div class="page-head">
+    <h2><svg class="i"><use href="#i-card"/></svg> Danh sách tài khoản</h2>
+    <div class="stat-pill">Tổng Bank <b id="totalCount">0</b></div>
   </div>
-  <div class="group-panel-body" id="groupPanelBody">
-    <div class="group-create-row">
-      <input type="text" id="newGroupName" placeholder="Tên nhóm mới..." style="margin:0;" />
-      <button onclick="createGroup()">➕ Tạo nhóm</button>
-    </div>
-    <div class="group-list" id="groupList">
-      <div class="group-empty">Chưa có nhóm nào. Tạo nhóm mới ở trên!</div>
-    </div>
-  </div>
-</div>
 
-<!-- 🔍 FILTER BAR (nhóm) -->
-<div class="group-filter-bar" id="groupFilterBar">
-  <button class="group-filter-toggle" id="groupFilterToggle" onclick="toggleGroupFilterDropdown()">
-    <span style="font-size:16px;">🗂️</span>
-    <span class="gf-current" id="groupFilterCurrent">Tất cả</span>
-    <span class="gf-arrow">▼</span>
-  </button>
-  <div class="group-filter-dropdown" id="groupFilterDropdown">
-    <button class="group-filter-tab active" onclick="filterByGroup(null, this)">🗂️ Tất cả</button>
-  </div>
-</div>
-
-<!-- 🔍 SEARCH -->
-<div class="search-wrapper">
-  <span class="search-icon">🔍</span>
-  <input type="text" id="searchInput" placeholder="Tìm theo tên hoặc số tài khoản..." oninput="handleSearch()" />
-  <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
-</div>
-<div class="search-result-count" id="searchResultCount"></div>
-
-<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-  <div class="section-title" style="margin: 0;">➕ Thêm tài khoản</div>
-</div>
-<input type="text" id="name" placeholder="Tên" />
-<input type="text" id="account" placeholder="Số tài khoản" />
-
-<div class="bank-select-wrapper" id="wrapper-tagSelect">
-  <div class="bank-select-display placeholder" id="display-tagSelect" onclick="toggleBankDropdown('tagSelect')">
-    <span class="display-text">-- Chọn ngân hàng --</span><span class="arrow">▼</span>
-  </div>
-  <input type="hidden" id="tagSelect" value="" />
-  <div class="bank-dropdown" id="dropdown-tagSelect">
-    <div class="bank-dropdown-search">🔍 <input type="text" placeholder="Tìm ngân hàng..." oninput="filterBankOptions('tagSelect', this.value)" /></div>
-    <div class="bank-dropdown-list" id="list-tagSelect"></div>
-  </div>
-</div>
-<button onclick="addAccount()" id="btnAdd">Thêm</button>
-
-<div class="section-title">🧾 Nhập hàng loạt</div>
-<textarea id="bulkInput" rows="5" placeholder="Nhập mỗi dòng: Tên - STK"></textarea>
-<div class="bank-select-wrapper" id="wrapper-bulkTag">
-  <div class="bank-select-display placeholder" id="display-bulkTag" onclick="toggleBankDropdown('bulkTag')">
-    <span class="display-text">-- Chọn ngân hàng --</span><span class="arrow">▼</span>
-  </div>
-  <input type="hidden" id="bulkTag" value="" />
-  <div class="bank-dropdown" id="dropdown-bulkTag">
-    <div class="bank-dropdown-search">🔍 <input type="text" placeholder="Tìm ngân hàng..." oninput="filterBankOptions('bulkTag', this.value)" /></div>
-    <div class="bank-dropdown-list" id="list-bulkTag"></div>
-  </div>
-</div>
-<button onclick="addBulk()" id="btnBulk">➕ Thêm hàng loạt</button>
-<button onclick="copyAll()">📋 Sao chép danh sách</button>
-<button onclick="deleteSelectedAccounts()">🗑️ Xoá đã chọn</button>
-<button onclick="openGroupModalForSelected()" style="width:100%;background:#7c3aed;color:white;border:none;">👥 Thêm đã chọn vào nhóm</button>
-
-<div id="accountList">Đang tải danh sách...</div>
-
-<!-- MODAL: chọn nhóm để add tài khoản -->
-<div class="modal-overlay" id="groupModal">
-  <div class="modal-box">
-    <div class="modal-title">👥 Thêm vào nhóm</div>
-    <div id="modalAccountInfo" style="font-size:13px;color:#555;margin-bottom:10px;"></div>
-    <div class="modal-group-list" id="modalGroupList"></div>
-    <div class="modal-actions">
-      <button class="modal-btn-cancel" onclick="closeGroupModal()">Huỷ</button>
-      <button class="modal-btn-confirm" onclick="confirmAddToGroup()">✅ Lưu</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: DATA tài khoản -->
-<div class="modal-overlay" id="dataModal">
-  <div class="modal-box" style="max-width: 420px;">
-    <div class="modal-title">📝 Thông tin tài khoản</div>
-    <div id="dataModalInfo" style="font-size:13px;color:#555;margin-bottom:12px;"></div>
-    <div style="display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;padding-right:2px;">
-      <div class="data-field-group">
-        <div class="data-field-label-row">
-          <label>👤 Tên tài khoản</label>
-          <button type="button" class="data-add-inline" onclick="addDataField('username')" title="Thêm dự phòng">+</button>
-        </div>
-        <div class="data-multi-list" id="dataUsernameList"></div>
+  <!-- ===== API SETTINGS ===== -->
+  <div class="api-settings-panel" id="apiSettingsPanel">
+    <div class="api-settings-header" onclick="toggleApiPanel()">
+      <div class="api-settings-header-left">
+        <span class="icon"><svg class="i"><use href="#i-sliders"/></svg></span>
+        Cài đặt API &amp; Hệ thống
+        <span class="api-saved-indicator" id="apiSavedDot" title="Đã lưu cài đặt"></span>
       </div>
-      <div class="data-field-group">
-        <div class="data-field-label-row">
-          <label>📱 Số điện thoại</label>
-          <button type="button" class="data-add-inline" onclick="addDataField('phone')" title="Thêm dự phòng">+</button>
-        </div>
-        <div class="data-multi-list" id="dataPhoneList"></div>
+      <button class="api-settings-toggle" id="apiToggleBtn" onclick="event.stopPropagation(); toggleApiPanel()">▼ Mở</button>
+    </div>
+    <div class="api-settings-body" id="apiSettingsBody">
+      <div class="api-section-heading">API Keys</div>
+      <div class="api-field-label">API Key chính <span class="badge badge-blue">DEFAULT_API_KEY</span></div>
+      <div class="api-input-wrap">
+        <input type="password" id="inputApiKey" placeholder="Nhập API Key..." autocomplete="off" spellcheck="false" />
+        <button class="api-eye-btn" onclick="toggleVisible('inputApiKey', 'eye1')" id="eye1" title="Hiện/ẩn">👁️</button>
       </div>
-      <div class="data-field-group">
-        <div class="data-field-label-row">
-          <label>📧 Gmail</label>
-          <button type="button" class="data-add-inline" onclick="addDataField('gmail')" title="Thêm dự phòng">+</button>
-        </div>
-        <div class="data-multi-list" id="dataGmailList"></div>
+      <div class="api-field-label">Captcha API Key <span class="badge badge-blue">DEFAULT_CAPTCHA_API_KEY</span></div>
+      <div class="api-input-wrap">
+        <input type="password" id="inputCaptchaKey" placeholder="Nhập Captcha API Key..." autocomplete="off" spellcheck="false" />
+        <button class="api-eye-btn" onclick="toggleVisible('inputCaptchaKey', 'eye2')" id="eye2" title="Hiện/ẩn">👁️</button>
+      </div>
+
+      <div class="api-section-heading">Mật khẩu hệ thống</div>
+      <div class="api-field-label">Mật khẩu đăng ký <span class="badge badge-orange">PASSWORD</span></div>
+      <div class="api-input-wrap">
+        <input type="password" id="inputPassword" placeholder="Nhập mật khẩu đăng ký..." autocomplete="new-password" />
+        <button class="api-eye-btn" onclick="toggleVisible('inputPassword', 'eye3')" id="eye3" title="Hiện/ẩn">👁️</button>
+      </div>
+      <div class="api-field-label">Mật khẩu rút tiền <span class="badge badge-orange">WITHDRAW_PASSWORD</span></div>
+      <div class="api-input-wrap">
+        <input type="password" id="inputWithdrawPassword" placeholder="Nhập mật khẩu rút tiền..." autocomplete="new-password" />
+        <button class="api-eye-btn" onclick="toggleVisible('inputWithdrawPassword', 'eye4')" id="eye4" title="Hiện/ẩn">👁️</button>
+      </div>
+
+      <div class="api-section-heading">Telegram</div>
+      <div class="api-field-label">Telegram Chat ID <span class="badge badge-teal">TG_CHATID</span></div>
+      <input type="text" id="inputTgChatId" class="api-input-plain" placeholder="Nhập Telegram Chat ID..." autocomplete="off" />
+
+      <div class="api-actions">
+        <button class="api-btn-save" onclick="saveApiKeys()">Lưu tất cả cài đặt</button>
+        <button class="api-btn-reset" onclick="resetApiKeys()">Reset</button>
+      </div>
+      <div class="api-status-msg" id="apiStatusMsg"></div>
+
+      <button class="btn-ghost-wide" onclick="showActiveKeys()"><svg class="i"><use href="#i-eye"/></svg> Xem cài đặt đang hoạt động</button>
+      <div class="active-key-box" id="activeKeyBox" style="display:none;">
+        <div class="active-key-row"><span class="active-key-label">API Key</span><span class="active-key-val" id="activeApiKeyVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activeApiKeyVal')">Copy</button></div>
+        <div class="active-key-row"><span class="active-key-label">Captcha</span><span class="active-key-val" id="activeCaptchaKeyVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activeCaptchaKeyVal')">Copy</button></div>
+        <div class="active-key-row"><span class="active-key-label">MK Đăng ký</span><span class="active-key-val" id="activePasswordVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activePasswordVal')">Copy</button></div>
+        <div class="active-key-row"><span class="active-key-label">MK Rút tiền</span><span class="active-key-val" id="activeWithdrawVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activeWithdrawVal')">Copy</button></div>
+        <div class="active-key-row"><span class="active-key-label">TG Chat ID</span><span class="active-key-val" id="activeTgChatIdVal"></span><button class="btn-copy-key" onclick="copyActiveKey('activeTgChatIdVal')">Copy</button></div>
       </div>
     </div>
-    <div class="api-status-msg" id="dataStatusMsg" style="margin-top:10px;"></div>
-    <div class="modal-actions" style="margin-top:14px;">
-      <button class="modal-btn-cancel" onclick="closeDataModal()">Huỷ</button>
-      <button class="modal-btn-confirm" onclick="saveAccountData()">💾 Lưu</button>
+  </div>
+
+  <!-- ===== GROUPS ===== -->
+  <div class="group-panel" id="groupPanel">
+    <div class="group-panel-header" onclick="toggleGroupPanel()">
+      <div class="group-panel-header-left">
+        <span class="panel-ico violet"><svg class="i"><use href="#i-users"/></svg></span>
+        Quản lý nhóm
+        <span class="count-badge" id="groupCountBadge">0</span>
+      </div>
+      <button class="group-panel-toggle" id="groupToggleBtn" onclick="event.stopPropagation(); toggleGroupPanel()">▼ Mở</button>
+    </div>
+    <div class="group-panel-body" id="groupPanelBody">
+      <div class="group-create-row">
+        <input type="text" id="newGroupName" placeholder="Tên nhóm mới..." />
+        <button onclick="createGroup()"><svg class="i"><use href="#i-plus"/></svg> Tạo nhóm</button>
+      </div>
+      <div class="group-list" id="groupList">
+        <div class="group-empty">Chưa có nhóm nào. Tạo nhóm mới ở trên!</div>
+      </div>
     </div>
   </div>
-</div>
+
+  <!-- ===== GROUP FILTER ===== -->
+  <div class="group-filter-bar" id="groupFilterBar">
+    <button class="group-filter-toggle" id="groupFilterToggle" onclick="toggleGroupFilterDropdown()">
+      <svg class="i"><use href="#i-folder"/></svg>
+      <span class="gf-current" id="groupFilterCurrent">Tất cả</span>
+      <span class="gf-arrow">▼</span>
+    </button>
+    <div class="group-filter-dropdown" id="groupFilterDropdown">
+      <button class="group-filter-tab active" onclick="filterByGroup(null, this)">Tất cả</button>
+    </div>
+  </div>
+
+  <!-- ===== SEARCH ===== -->
+  <div class="search-wrapper">
+    <span class="search-icon"><svg class="i"><use href="#i-search"/></svg></span>
+    <input type="text" id="searchInput" placeholder="Tìm theo tên hoặc số tài khoản..." oninput="handleSearch()" autocomplete="off" />
+    <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
+  </div>
+  <div class="search-result-count" id="searchResultCount"></div>
+
+  <!-- ===== ADD ===== -->
+  <div class="card">
+    <div class="section-title"><svg class="i"><use href="#i-plus"/></svg> Thêm tài khoản</div>
+    <input type="text" id="name" placeholder="Tên" autocomplete="off" />
+    <input type="text" id="account" placeholder="Số tài khoản" inputmode="numeric" autocomplete="off" />
+
+    <div class="bank-select-wrapper" id="wrapper-tagSelect">
+      <div class="bank-select-display placeholder" id="display-tagSelect" onclick="toggleBankDropdown('tagSelect')">
+        <span class="display-text">-- Chọn ngân hàng --</span><span class="arrow">▼</span>
+      </div>
+      <input type="hidden" id="tagSelect" value="" />
+      <div class="bank-dropdown" id="dropdown-tagSelect">
+        <div class="bank-dropdown-search"><svg class="i"><use href="#i-search"/></svg> <input type="text" placeholder="Tìm ngân hàng..." oninput="filterBankOptions('tagSelect', this.value)" /></div>
+        <div class="bank-dropdown-list" id="list-tagSelect"></div>
+      </div>
+    </div>
+    <button class="btn-block btn-primary" onclick="addAccount()" id="btnAdd"><svg class="i"><use href="#i-plus"/></svg> Thêm</button>
+  </div>
+
+  <!-- ===== BULK ===== -->
+  <div class="card">
+    <div class="section-title"><svg class="i"><use href="#i-list"/></svg> Nhập hàng loạt</div>
+    <textarea id="bulkInput" rows="5" placeholder="Mỗi dòng: Tên - STK" spellcheck="false"></textarea>
+    <div class="bank-select-wrapper" id="wrapper-bulkTag">
+      <div class="bank-select-display placeholder" id="display-bulkTag" onclick="toggleBankDropdown('bulkTag')">
+        <span class="display-text">-- Chọn ngân hàng --</span><span class="arrow">▼</span>
+      </div>
+      <input type="hidden" id="bulkTag" value="" />
+      <div class="bank-dropdown" id="dropdown-bulkTag">
+        <div class="bank-dropdown-search"><svg class="i"><use href="#i-search"/></svg> <input type="text" placeholder="Tìm ngân hàng..." oninput="filterBankOptions('bulkTag', this.value)" /></div>
+        <div class="bank-dropdown-list" id="list-bulkTag"></div>
+      </div>
+    </div>
+    <button class="btn-block btn-primary" onclick="addBulk()" id="btnBulk"><svg class="i"><use href="#i-plus"/></svg> Thêm hàng loạt</button>
+
+    <div class="toolbar" style="margin-top:12px;">
+      <button class="btn-block btn-secondary" onclick="copyAll()"><svg class="i"><use href="#i-copy"/></svg> Sao chép danh sách</button>
+      <button class="btn-block btn-secondary btn-danger-outline" onclick="deleteSelectedAccounts()"><svg class="i"><use href="#i-trash"/></svg> Xoá đã chọn</button>
+      <button class="btn-block btn-violet span-2" onclick="openGroupModalForSelected()"><svg class="i"><use href="#i-users"/></svg> Thêm đã chọn vào nhóm</button>
+    </div>
+  </div>
+
+  <div id="accountList">Đang tải danh sách...</div>
+
+  <!-- MODAL: chọn nhóm -->
+  <div class="modal-overlay" id="groupModal">
+    <div class="modal-box">
+      <div class="modal-title"><svg class="i"><use href="#i-users"/></svg> Thêm vào nhóm</div>
+      <div id="modalAccountInfo" style="font-size:13px;color:var(--text-2);margin-bottom:10px;"></div>
+      <div class="modal-group-list" id="modalGroupList"></div>
+      <div class="modal-actions">
+        <button class="modal-btn-cancel" onclick="closeGroupModal()">Huỷ</button>
+        <button class="modal-btn-confirm" onclick="confirmAddToGroup()">Lưu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DATA tài khoản -->
+  <div class="modal-overlay" id="dataModal">
+    <div class="modal-box" style="max-width:420px;">
+      <div class="modal-title"><svg class="i"><use href="#i-user"/></svg> Thông tin tài khoản</div>
+      <div id="dataModalInfo" style="font-size:13px;color:var(--text-2);margin-bottom:12px;"></div>
+      <div style="display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;padding-right:2px;">
+        <div class="data-field-group">
+          <div class="data-field-label-row">
+            <label>Tên tài khoản</label>
+            <button type="button" class="data-add-inline" onclick="addDataField('username')" title="Thêm dự phòng">+</button>
+          </div>
+          <div class="data-multi-list" id="dataUsernameList"></div>
+        </div>
+        <div class="data-field-group">
+          <div class="data-field-label-row">
+            <label>Số điện thoại</label>
+            <button type="button" class="data-add-inline" onclick="addDataField('phone')" title="Thêm dự phòng">+</button>
+          </div>
+          <div class="data-multi-list" id="dataPhoneList"></div>
+        </div>
+        <div class="data-field-group">
+          <div class="data-field-label-row">
+            <label>Gmail</label>
+            <button type="button" class="data-add-inline" onclick="addDataField('gmail')" title="Thêm dự phòng">+</button>
+          </div>
+          <div class="data-multi-list" id="dataGmailList"></div>
+        </div>
+      </div>
+      <div class="api-status-msg" id="dataStatusMsg" style="margin-top:10px;"></div>
+      <div class="modal-actions" style="margin-top:14px;">
+        <button class="modal-btn-cancel" onclick="closeDataModal()">Huỷ</button>
+        <button class="modal-btn-confirm" onclick="saveAccountData()">Lưu</button>
+      </div>
+    </div>
+  </div>
 
 </div>
 
