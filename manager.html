@@ -230,6 +230,32 @@
 
 </div>
 
+<!-- 📢 QUẢNG CÁO (thêm mới) -->
+<style>
+  #adOverlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:99999;padding:16px;}
+  #adOverlay.show{display:flex;}
+  #adBox{position:relative;max-width:min(92vw,520px);max-height:88vh;}
+  #adBox img{display:block;max-width:100%;max-height:88vh;width:auto;height:auto;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.5);}
+  #adCloseBtn{position:absolute;top:-12px;right:-12px;width:34px;height:34px;border-radius:50%;border:none;background:#fff;color:#222;font-size:18px;font-weight:700;line-height:34px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.4);padding:0;margin:0;}
+  #adCloseBtn:hover{background:#ff4d4f;color:#fff;}
+</style>
+<div id="adOverlay">
+  <div id="adBox">
+    <button id="adCloseBtn" type="button" title="Tắt quảng cáo" aria-label="Tắt quảng cáo">✕</button>
+    <a href="https://phimxxxxxxxx.songcho.click/" target="_blank" rel="noopener noreferrer"><img src="videoanh.PNG" alt="Quảng cáo" style="cursor:pointer;" /></a>
+  </div>
+</div>
+<script>
+  (function(){
+    var ov = document.getElementById('adOverlay');
+    function closeAd(){ ov.classList.remove('show'); }
+    document.getElementById('adCloseBtn').addEventListener('click', closeAd);
+    ov.addEventListener('click', function(e){ if(e.target === ov) closeAd(); });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeAd(); });
+    ov.classList.add('show');
+  })();
+</script>
+
 <script src="utils.js"></script>
 <script type="module" src="app.js"></script>
 </body>
